@@ -1,0 +1,36 @@
+.custom-button-menu {
+  margin-right: 5px;
+  width: 200px;
+  height: 60px;
+}
+.custom-button-menu-last {
+  width: 200px;
+  height: 60px;
+}
+
+.custom-button-menu-selected{
+  background-color: orange;
+  color: 'grey';
+  width: 200px;
+  height: 60px;
+}
+
+.custom-button-menu-selected:hover {
+  background-color: orange;
+  border-color: orange;
+  color: 'grey'
+}
+
+.custom-button-menu:hover {
+  background-color: orange;
+  border-color: orange;
+}
+
+.custom-button-menu-last:hover {
+  background-color: orange;
+  border-color: orange;
+}
+.custom-button-add {
+  background-color: orange;
+  border-color: orange;
+}

@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GestaoComercio.Domain\GestaoComercio.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
+    <Folder Include="Models\Caixa\Queries\" />
+    <Folder Include="Models\Despesa\Queries\" />
+    <Folder Include="Models\Fornecedor\Queries\" />
+    <Folder Include="Models\NomeProdutos\Queries\" />
+    <Folder Include="Models\Precificacao\Queries\" />
+    <Folder Include="Models\Pedido\Queries\" />
+  </ItemGroup>
+
+</Project>
