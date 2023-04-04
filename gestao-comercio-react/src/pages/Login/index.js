@@ -25,7 +25,7 @@ const Signin = () => {
       window.removeEventListener('popstate', () => {
         signout()
     })};
-  }, []);
+  }, [signout]);
 
   const [nome, setNome] = useState("");
   const [senha, setSenha] = useState("");
@@ -63,7 +63,6 @@ const Signin = () => {
       setError(res);
       return;
     }
-
     navigate("/despesas");*/
 
   };

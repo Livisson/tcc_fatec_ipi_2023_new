@@ -1,7 +1,19 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
-import { FaUser, FaChartBar, FaMapMarkedAlt, FaClipboardList, FaBox, FaMoneyBillWave, FaCashRegister, FaCog, FaSignOutAlt, FaTrash } from "react-icons/fa";
+import { 
+  FaUser, 
+  FaChartBar, 
+  FaDollyFlatbed, 
+  FaFileInvoiceDollar, 
+  FaClipboardList, 
+  FaBox, 
+  FaMoneyBillWave, 
+  FaCashRegister, 
+  FaCog, 
+  FaSignOutAlt, 
+  FaTrash 
+} from "react-icons/fa";
 import { Link } from "react-router-dom";
 import LogoCompre from "../../LogoCompre.png";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -248,13 +260,13 @@ const Pedido = () => {
   }
 
   return (
-    <Container style={{ backgroundColor: "white" }}>
+    <Container fluid style={{ backgroundColor: "white" }}>
       <Row className="justify-content-md-center">
-        <Col style={{textAlign: "left", verticalAlign: "middle", alignSelf: "center"}}>
-          <img src={LogoCompre} alt="Logo" height="80" style={{borderRadius: 7}}/>
-        </Col>
-        <Col style={{textAlign: "left", verticalAlign: "middle", alignSelf: "center"}} xs={6}><label style={{fontSize:22, fontWeight: "bold", color: "gray"}}>PEDIDOS</label></Col>
-        <Col style={{textAlign: "right", verticalAlign: "middle", alignSelf: "center"}}>
+        <img className="col-2 p-0" src={LogoCompre} alt="Logo" style={{borderRadius: 7, textAlign: "left", verticalAlign: "middle", alignSelf: "center"}}/>
+        <div className="col" style={{textAlign: "left", verticalAlign: "middle", alignSelf: "center"}} xs={6}>
+          <label style={{fontSize:22, fontWeight: "bold", color: "gray"}}>PEDIDOS</label>
+        </div>
+        <div className="col" style={{textAlign: "right", verticalAlign: "middle", alignSelf: "center"}}>
           <Row style={{ height: '50px'}}>
             <div className="mb-2">
               <DropdownButton
@@ -269,193 +281,228 @@ const Pedido = () => {
                   </>
                 }
               >
-                <Dropdown.Item eventKey="1"><Link to="/config" style={{color: 'grey', textDecoration: 'none', display: 'flex', alignItems: 'center'}}><FaCog  className="me-2" />Configurações</Link></Dropdown.Item>
-                <Dropdown.Item eventKey="2"><Link to="/" style={{color: 'grey', textDecoration: 'none', display: 'flex', alignItems: 'center'}}><FaSignOutAlt  className="me-2" />Sair</Link></Dropdown.Item>
+                <Dropdown.Item eventKey="1">
+                  <Link to="/config" style={{color: 'grey', textDecoration: 'none', display: 'flex', alignItems: 'center'}}>
+                    <FaCog  className="me-2" />Configurações
+                  </Link>
+                </Dropdown.Item>
+                <Dropdown.Item eventKey="2">
+                  <Link to="/login" style={{color: 'grey', textDecoration: 'none', display: 'flex', alignItems: 'center'}}>
+                    <FaSignOutAlt  className="me-2" />Sair
+                  </Link>
+                </Dropdown.Item>
               </DropdownButton>
             </div>
           </Row>
+        </div>
+      </Row>
+      <Row id="barra de nav" className="justify-content-md-center">
+        <Col style={{backgroundColor: '#f8f9fa'}} xs={2} className="pt-4">
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/consolidado">
+                <FaChartBar className="me-2" />Consolidado
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/despesas">
+                <FaFileInvoiceDollar className="me-2" />Despesas
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/pedidos">
+                <FaClipboardList className="me-2" />Pedidos
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/fornecedores">
+                <FaDollyFlatbed className="me-2" />Fornecedores
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/estoque">
+                <FaBox className="me-2" />Estoque
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/precificar">
+                <FaMoneyBillWave className="me-2" />Precificação
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/caixa">
+                <FaCashRegister className="me-2" />Caixa
+              </Link>
+            </Button>
+          </Row>
+        </Col>
+        <Col className="pt-4">
+          <Row className="justify-content-md-center">
+            <div className="d-flex justify-content-between">
+              <div className="d-flex align-items-center mb-4">
+                <label style={{ flex: 1, marginRight:"10px", fontWeight: "bold", color: "Grey" }}>Fornecedor</label>
+                <DropdownButton id="filtro-dropdown" title={fornecedorFiltro ? fornecedores.find(fornecedor => fornecedor.cnpj === fornecedorFiltro).nome  : "Selecione um Fornecedor"} variant="outline-secondary">
+                  {fornecedores.map((fornecedor) => (
+                    <Dropdown.Item className="empty-option" key={fornecedor.cnpj} eventKey={fornecedor.cnpj} onClick={handleSelectFiltro.bind(this, fornecedor.cnpj, fornecedor.eventKey)} onSelect={handleSelectFiltro}>
+                      {fornecedor.nome}
+                    </Dropdown.Item>
+                  ))}
+                </DropdownButton>
+              </div>
+              <Button variant="warning" className="custom-button-add" style={{ height: "35px", width: "100px", marginBottom: "5px", color:"grey" }} onClick={() => adicionarPedido()}>Adicionar</Button>
+            </div>
+          </Row>
+          <Table striped hover>
+            <thead>
+              <tr>
+                <th className="text-center">Produto</th>
+                <th className="text-center">Cód. Barras</th>
+                <th className="text-center">Fornecedor</th>
+                <th className="text-center">Valor R$(un.)</th>
+                <th className="text-center">Quant.</th>
+                <th className="text-center">Valor R$(total)</th>
+                <th className="text-center">Pagamento</th>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {pedido.map((item, index) => (
+                <tr key={item.id}>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.nomeProduto}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.codigoBarras}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.nomeFornecedor}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>R$ {item.valorCompra.toFixed(2)}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.quantidade}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>R$ {item.valorTotal.toFixed(2)}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{new Date(item.dataPagamento).toLocaleDateString("pt-BR")}</td>
+                  <td className="text-center" style={{ verticalAlign: "middle"}}>
+                    <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => removerPedido(item)}>
+                      <FaTrash />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          <br/>
+          <Modal show={modalAberto} onHide={() => setModalAberto(false)}>
+            <Modal.Header closeButton>
+              <Modal.Title style={{fontWeight: "bold", color: "Grey"}}>{"Novo Pedido"}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form onSubmit={handleAdicionar}>
+                <Form.Group controlId="fornecedor" style={{ marginBottom: "20px" }}>
+                  <Form.Label>Fornecedor</Form.Label>
+                  <Form.Control
+                    as="select"
+                    value={codigoFornecedor}
+                    onChange={handleCodigoFornecedorChange}
+                    required
+                    isInvalid={formEnviado && codigoFornecedor.length === 0}
+                  >
+                    <option value="">Selecione um fornecedor</option>
+                    {fornecedores.map((fornecedor) => (
+                      <option key={fornecedor.cnpj} value={fornecedor.cnpj}>
+                        {fornecedor.nome}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </Form.Group>
+                <Form.Group controlId="codigoBarras" style={{ marginBottom: "20px" }}>
+                  <Form.Label>Código de Barras</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Digite o código de barras"
+                    value={codigoBarras}
+                    onChange={handleCodigoBarrasChange}
+                    required
+                    minLength={13}
+                    isInvalid={formEnviado && codigoBarras.length < 13}
+                  />
+                </Form.Group>
+                <Form.Group controlId="produto" style={{ marginBottom: "20px" }}>
+                  <Form.Label>Nome produto</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Digite o nome do produto"
+                    value={nomeProduto}
+                    onChange={handleNomeProdutoChange}
+                    disabled={disableProd}
+                    required
+                    isInvalid={formEnviado && nomeProduto.length === 0}
+                  />
+                </Form.Group>
+                <Form.Group controlId="valorCompra" style={{ marginBottom: "20px" }}>
+                  <Form.Label>Valor Compra</Form.Label>
+                  <Form.Control
+                    type="number"
+                    step="0.01"
+                    placeholder="Digite o valor da compra"
+                    value={valorCompra}
+                    onChange={handleValorCompraChange}
+                    required
+                    isInvalid={formEnviado && valorCompra.length === 0}
+                  />
+                </Form.Group>
+                <Form.Group controlId="quantidade" style={{marginBottom: "20px"}}>
+                  <Form.Label>Quantidade</Form.Label>
+                  <Form.Control type="number" placeholder="Digite a quantidade" value={quantidade} onChange={handleQuantidadeChange} required isInvalid={formEnviado && quantidade.length === 0}/>
+                </Form.Group>
+                <Form.Group controlId="dataPagamento" style={{marginBottom: "20px"}}>
+                  <Form.Label>Data Pagamento</Form.Label>
+                  <Form.Control type="date" placeholder="Selecione a data de pagamento" value={dataPagamento} onChange={handleDataPagamentoChange} required isInvalid={formEnviado && dataPagamento.length === 0}/>
+                </Form.Group>
+                <Modal.Footer>
+                  <Button variant="success" type="submit">
+                    Salvar
+                  </Button>
+                  <Button variant="secondary" onClick={() => setModalAberto(false)}>Fechar</Button>
+                </Modal.Footer>
+              </Form>
+            </Modal.Body>  
+          </Modal>
+          {showDeleteConfirmation && (
+            <Modal show={showDeleteConfirmation} onHide={() => handleCloseDeleteConfirmation(false)}>
+              <Modal.Header closeButton>
+                <Modal.Title>Confirmação de exclusão</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                Tem certeza que deseja excluir o Pedido "{itemToDelete.nomeProduto}"?
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="danger" onClick={() => handleCloseDeleteConfirmation(true)}>
+                  Confirmar
+                </Button>
+                <Button variant="secondary" onClick={() => handleCloseDeleteConfirmation(false)}>
+                  Cancelar
+                </Button>
+              </Modal.Footer>
+            </Modal>
+          )}
+          <Toast show={showErrorToast} onClose={() => setShowErrorToast(false)} bg="danger" delay={3000} autohide>
+            <Toast.Body className="text-white">{errorMessage}</Toast.Body>
+          </Toast>
+          <Toast show={showSuccessToast} onClose={() => setShowSuccessToast(false)} bg="success" delay={3000} autohide>
+            <Toast.Body className="text-white">{successMessage}</Toast.Body>
+          </Toast>
         </Col>
       </Row>
       <br/>
-      <Row className="justify-content-md-center">
-        <div className="d-flex justify-content-between">
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/consolidado"><FaChartBar className="me-2" />Consolidado</Link></Button>
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/despesas"><FaMapMarkedAlt className="me-2" />Mapa de Custos</Link></Button>
-          <Dropdown className="d-inline-block">
-            <Dropdown.Toggle style={{color: 'grey'}} className="custom-button-menu-selected" variant="light" id="dropdown-basic">
-              <FaClipboardList className="me-2" />Pedidos
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu>
-              <Dropdown.Item style={{color: 'grey'}}>Pedidos</Dropdown.Item>
-              <Dropdown.Item style={{color: 'grey'}}><Link style={{color: 'grey'}} className="nav-link" to="/fornecedores">Fornecedores</Link></Dropdown.Item>
-              {/*<Dropdown.Item style={{color: 'grey'}}><Link style={{color: 'grey'}} className="nav-link" to="/produtos">Produtos</Link></Dropdown.Item>*/}
-            </Dropdown.Menu>
-          </Dropdown>
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/estoque"><FaBox className="me-2" />Estoque</Link></Button>
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/precificar"><FaMoneyBillWave className="me-2" />Precificação</Link></Button>
-          <Button variant="light" className="custom-button-menu-last"><Link style={{color: 'grey'}} className="nav-link" to="/caixa"><FaCashRegister className="me-2" />Caixa</Link></Button>
-        </div>
-      </Row>
       <br/>
-      <br/>
-      <Row className="justify-content-md-center">
-        <div className="d-flex justify-content-between">
-          <label style={{fontWeight: "bold", color: "Green"}}>Pedidos</label>
-        </div>
-      </Row>
-      <br/>
-      <Row className="justify-content-md-center">
-        <div className="d-flex justify-content-between">
-          <div className="d-flex align-items-center mb-4">
-            <label style={{ flex: 1, marginRight:"10px", fontWeight: "bold", color: "Grey" }}>Fornecedor</label>
-            <DropdownButton id="filtro-dropdown" title={fornecedorFiltro ? fornecedores.find(fornecedor => fornecedor.cnpj === fornecedorFiltro).nome  : "Selecione um Fornecedor"} variant="outline-secondary">
-              {fornecedores.map((fornecedor) => (
-                <Dropdown.Item className="empty-option" key={fornecedor.cnpj} eventKey={fornecedor.cnpj} onClick={handleSelectFiltro.bind(this, fornecedor.cnpj, fornecedor.eventKey)} onSelect={handleSelectFiltro}>
-                  {fornecedor.nome}
-                </Dropdown.Item>
-              ))}
-            </DropdownButton>
-          </div>
-          <Button variant="warning" className="custom-button-add" style={{ height: "35px", width: "100px", marginBottom: "5px", color:"grey" }} onClick={() => adicionarPedido()}>Adicionar</Button>
-        </div>
-      </Row>
-      <Row>
-        <Table striped hover>
-          <thead>
-            <tr>
-              <th className="text-center">Produto</th>
-              <th className="text-center">Cód. Barras</th>
-              <th className="text-center">Fornecedor</th>
-              <th className="text-center">Valor R$(un.)</th>
-              <th className="text-center">Quant.</th>
-              <th className="text-center">Valor R$(total)</th>
-              <th className="text-center">Pagamento</th>
-              <th></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {pedido.map((item, index) => (
-              <tr key={item.id}>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.nomeProduto}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.codigoBarras}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.nomeFornecedor}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>R$ {item.valorCompra.toFixed(2)}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.quantidade}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>R$ {item.valorTotal.toFixed(2)}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{new Date(item.dataPagamento).toLocaleDateString("pt-BR")}</td>
-                <td className="text-center" style={{ verticalAlign: "middle"}}>
-                  <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => removerPedido(item)}>
-                    <FaTrash />
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </Row>
-      <br/>
-      <Modal show={modalAberto} onHide={() => setModalAberto(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title style={{fontWeight: "bold", color: "Grey"}}>{"Novo Pedido"}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleAdicionar}>
-            <Form.Group controlId="fornecedor" style={{ marginBottom: "20px" }}>
-              <Form.Label>Fornecedor</Form.Label>
-              <Form.Control
-                as="select"
-                value={codigoFornecedor}
-                onChange={handleCodigoFornecedorChange}
-                required
-                isInvalid={formEnviado && codigoFornecedor.length === 0}
-              >
-                <option value="">Selecione um fornecedor</option>
-                {fornecedores.map((fornecedor) => (
-                  <option key={fornecedor.cnpj} value={fornecedor.cnpj}>
-                    {fornecedor.nome}
-                  </option>
-                ))}
-              </Form.Control>
-            </Form.Group>
-            <Form.Group controlId="codigoBarras" style={{ marginBottom: "20px" }}>
-              <Form.Label>Código de Barras</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Digite o código de barras"
-                value={codigoBarras}
-                onChange={handleCodigoBarrasChange}
-                required
-                minLength={13}
-                isInvalid={formEnviado && codigoBarras.length < 13}
-              />
-            </Form.Group>
-            <Form.Group controlId="produto" style={{ marginBottom: "20px" }}>
-              <Form.Label>Nome produto</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Digite o nome do produto"
-                value={nomeProduto}
-                onChange={handleNomeProdutoChange}
-                disabled={disableProd}
-                required
-                isInvalid={formEnviado && nomeProduto.length === 0}
-              />
-            </Form.Group>
-            <Form.Group controlId="valorCompra" style={{ marginBottom: "20px" }}>
-              <Form.Label>Valor Compra</Form.Label>
-              <Form.Control
-                type="number"
-                step="0.01"
-                placeholder="Digite o valor da compra"
-                value={valorCompra}
-                onChange={handleValorCompraChange}
-                required
-                isInvalid={formEnviado && valorCompra.length === 0}
-              />
-            </Form.Group>
-            <Form.Group controlId="quantidade" style={{marginBottom: "20px"}}>
-              <Form.Label>Quantidade</Form.Label>
-              <Form.Control type="number" placeholder="Digite a quantidade" value={quantidade} onChange={handleQuantidadeChange} required isInvalid={formEnviado && quantidade.length === 0}/>
-            </Form.Group>
-            <Form.Group controlId="dataPagamento" style={{marginBottom: "20px"}}>
-              <Form.Label>Data Pagamento</Form.Label>
-              <Form.Control type="date" placeholder="Selecione a data de pagamento" value={dataPagamento} onChange={handleDataPagamentoChange} required isInvalid={formEnviado && dataPagamento.length === 0}/>
-            </Form.Group>
-            <Modal.Footer>
-              <Button variant="success" type="submit">
-                Salvar
-              </Button>
-              <Button variant="secondary" onClick={() => setModalAberto(false)}>Fechar</Button>
-            </Modal.Footer>
-          </Form>
-        </Modal.Body>  
-      </Modal>
-      {showDeleteConfirmation && (
-        <Modal show={showDeleteConfirmation} onHide={() => handleCloseDeleteConfirmation(false)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Confirmação de exclusão</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            Tem certeza que deseja excluir o Pedido "{itemToDelete.nomeProduto}"?
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="danger" onClick={() => handleCloseDeleteConfirmation(true)}>
-              Confirmar
-            </Button>
-            <Button variant="secondary" onClick={() => handleCloseDeleteConfirmation(false)}>
-              Cancelar
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      )}
-      <Toast show={showErrorToast} onClose={() => setShowErrorToast(false)} bg="danger" delay={3000} autohide>
-        <Toast.Body className="text-white">{errorMessage}</Toast.Body>
-      </Toast>
-      <Toast show={showSuccessToast} onClose={() => setShowSuccessToast(false)} bg="success" delay={3000} autohide>
-        <Toast.Body className="text-white">{successMessage}</Toast.Body>
-      </Toast>  
+        
     </Container>
   );
 };

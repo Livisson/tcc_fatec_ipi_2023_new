@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from "react";
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
-import { FaUser, FaChartBar, FaMapMarkedAlt, FaClipboardList, FaBox, FaMoneyBillWave, FaCashRegister, FaCog, FaSignOutAlt, FaPencilAlt } from "react-icons/fa";
+import { 
+  FaUser, 
+  FaChartBar, 
+  FaDollyFlatbed, 
+  FaFileInvoiceDollar,
+  FaClipboardList, 
+  FaBox, 
+  FaMoneyBillWave, 
+  FaCashRegister, 
+  FaCog, 
+  FaSignOutAlt, 
+  FaPencilAlt 
+} from "react-icons/fa";
 import { Link } from "react-router-dom";
 import LogoCompre from "../../LogoCompre.png";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -105,13 +117,13 @@ const Config = () => {
   };
 
   return (
-    <Container style={{ backgroundColor: "white" }}>
+    <Container fluid style={{ backgroundColor: "white" }}>
       <Row className="justify-content-md-center">
-        <Col style={{textAlign: "left", verticalAlign: "middle", alignSelf: "center"}}>
-          <img src={LogoCompre} alt="Logo" height="80" style={{borderRadius: 7}}/>
-        </Col>
-        <Col style={{textAlign: "left", verticalAlign: "middle", alignSelf: "center"}} xs={6}><label style={{fontSize:22, fontWeight: "bold", color: "gray"}}>CONFIGURAÇÕES</label></Col>
-        <Col style={{textAlign: "right", verticalAlign: "middle", alignSelf: "center"}}>
+        <img className="col-2 p-0" src={LogoCompre} alt="Logo" style={{borderRadius: 7, textAlign: "left", verticalAlign: "middle", alignSelf: "center"}}/>
+        <div className="col" style={{textAlign: "left", verticalAlign: "middle", alignSelf: "center"}} xs={6}>
+          <label style={{fontSize:22, fontWeight: "bold", color: "gray"}}>CONSOLIDADO</label>
+        </div>
+        <div className="col" style={{textAlign: "right", verticalAlign: "middle", alignSelf: "center"}}>
           <Row style={{ height: '50px'}}>
             <div className="mb-2">
               <DropdownButton
@@ -126,103 +138,144 @@ const Config = () => {
                   </>
                 }
               >
-                <Dropdown.Item eventKey="1"><Link to="/config" style={{color: 'grey', textDecoration: 'none', display: 'flex', alignItems: 'center'}}><FaCog  className="me-2" />Configurações</Link></Dropdown.Item>
-                <Dropdown.Item eventKey="2"><Link to="/" style={{color: 'grey', textDecoration: 'none', display: 'flex', alignItems: 'center'}}><FaSignOutAlt  className="me-2" />Sair</Link></Dropdown.Item>
+                <Dropdown.Item eventKey="1">
+                  <Link to="/config" style={{color: 'grey', textDecoration: 'none', display: 'flex', alignItems: 'center'}}>
+                    <FaCog  className="me-2" />Configurações
+                  </Link>
+                </Dropdown.Item>
+                <Dropdown.Item eventKey="2">
+                  <Link to="/login" style={{color: 'grey', textDecoration: 'none', display: 'flex', alignItems: 'center'}}>
+                    <FaSignOutAlt  className="me-2" />Sair
+                  </Link>
+                </Dropdown.Item>
               </DropdownButton>
             </div>
           </Row>
+        </div>
+      </Row>
+      <Row className="justify-content-md-center">
+        <Col style={{backgroundColor: '#f8f9fa'}} xs={2} className="pt-4">
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/consolidado">
+                <FaChartBar className="me-2" />Consolidado
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/despesas">
+                <FaFileInvoiceDollar className="me-2" />Despesas
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/pedidos">
+                <FaClipboardList className="me-2" />Pedidos
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/fornecedores">
+                <FaDollyFlatbed className="me-2" />Fornecedores
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/estoque">
+                <FaBox className="me-2" />Estoque
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/precificar">
+                <FaMoneyBillWave className="me-2" />Precificação
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/caixa">
+                <FaCashRegister className="me-2" />Caixa
+              </Link>
+            </Button>
+          </Row>
         </Col>
-      </Row>
-      <br/>
-      <Row className="justify-content-md-center">
-        <div className="d-flex justify-content-between">
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/consolidado"><FaChartBar className="me-2" />Consolidado</Link></Button>
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/despesas"><FaMapMarkedAlt className="me-2" />Mapa de Custos</Link></Button>
-          <Dropdown className="d-inline-block">
-            <Dropdown.Toggle style={{color: 'grey'}} className="custom-button-menu" variant="light" id="dropdown-basic">
-              <FaClipboardList className="me-2" />Produtos
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu>
-              <Dropdown.Item style={{color: 'grey'}}><Link style={{color: 'grey'}} className="nav-link" to="/pedidos">Pedidos</Link></Dropdown.Item>
-              <Dropdown.Item style={{color: 'grey'}}><Link style={{color: 'grey'}} className="nav-link" to="/fornecedores">Fornecedores</Link></Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/estoque"><FaBox className="me-2" />Estoque</Link></Button>
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/precificar"><FaMoneyBillWave className="me-2" />Precificação</Link></Button>
-          <Button variant="light" className="custom-button-menu-last"><Link style={{color: 'grey'}} className="nav-link" to="/caixa"><FaCashRegister className="me-2" />Caixa</Link></Button>
-        </div>
-      </Row>
-      <br/>
-      <br/>
-      <Row className="justify-content-md-center">
-        <div className="d-flex justify-content-between">
-          <label style={{fontWeight: "bold", color: "Green"}}>Alterar Senha</label>
-        </div>
-      </Row>
-      <br/>
-      <br/>
-      <Row>
-        <Table striped hover>
-          <thead>
-            <tr>
-              <th className="text-left">Usuário</th>
-              <th className="text-center">Senha</th>
-              <th className="text-center">E-mail Casatrado</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr key={usuario.id}>
-              <td style={{ verticalAlign: "middle", textAlign: "left"}}>{usuario.nome}</td>
-              <td style={{ verticalAlign: "middle", textAlign: "center"}}>{usuario.senha}</td>
-              <td style={{ verticalAlign: "middle", textAlign: "center"}}>{usuario.email}</td>
-              <td className="text-center" style={{ verticalAlign: "middle"}}>
-                <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => editarUsuario(usuario)}>
-                  <FaPencilAlt />
-                </Button>
-              </td>
-            </tr>
-          </tbody>
-        </Table>
-      </Row>
-      <br/>
-      <Modal show={modalAberto} onHide={() => setModalAberto(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title style={{fontWeight: "bold", color: "Grey"}}>{itemSelecionado ? "Editar Usuario" : "Novo Usuário"}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleEditar}>
-            <Form.Group controlId="nome" style={{marginBottom: "20px"}}>
-              <Form.Label>Nome do Usuário</Form.Label>
-              <Form.Control type="text" placeholder="Digite o nome do Usuário" value={nome} onChange={handleNomeChange} required
-                isInvalid={formEnviado && nome.length < 5}/>
-            </Form.Group>
-            <Form.Group controlId="senha" style={{marginBottom: "20px"}}>
-              <Form.Label>Senha</Form.Label>
-              <Form.Control type="password" placeholder="Digite a nova senha" value={senha} onChange={handleSenhaChange} required minLength={5}
-                isInvalid={formEnviado && senha.length < 5}/>
-            </Form.Group>
-            <Form.Group controlId="email" style={{marginBottom: "20px"}}>
-              <Form.Label>Quantidade</Form.Label>
-              <Form.Control type="email" placeholder="Digite o e-mail" value={email} onChange={handleEmailChange} required
-                isInvalid={formEnviado && email.length < 8}/>
-            </Form.Group>
-            <Modal.Footer>
-              <Button variant="success" type="submit">
-                Salvar
-              </Button>
-              <Button variant="secondary" onClick={() => setModalAberto(false)}>Fechar</Button>
-            </Modal.Footer>
-          </Form>
-        </Modal.Body>  
-      </Modal>
-      <Toast show={showErrorToast} onClose={() => setShowErrorToast(false)} bg="danger" delay={3000} autohide>
-        <Toast.Body className="text-white">{errorMessage}</Toast.Body>
-      </Toast>
-      <Toast show={showSuccessToast} onClose={() => setShowSuccessToast(false)} bg="success" delay={3000} autohide>
-        <Toast.Body className="text-white">{successMessage}</Toast.Body>
-      </Toast>  
+        <Col>
+          <Row className="justify-content-md-center">
+            <div className="d-flex justify-content-between">
+              <label style={{fontWeight: "bold", color: "Green"}}>Alterar Senha</label>
+            </div>
+          </Row>
+          <br/>
+          <br/>
+          <Row>
+            <Table striped hover>
+              <thead>
+                <tr>
+                  <th className="text-left">Usuário</th>
+                  <th className="text-center">Senha</th>
+                  <th className="text-center">E-mail Casatrado</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr key={usuario.id}>
+                  <td style={{ verticalAlign: "middle", textAlign: "left"}}>{usuario.nome}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{usuario.senha}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{usuario.email}</td>
+                  <td className="text-center" style={{ verticalAlign: "middle"}}>
+                    <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => editarUsuario(usuario)}>
+                      <FaPencilAlt />
+                    </Button>
+                  </td>
+                </tr>
+              </tbody>
+            </Table>
+          </Row>
+          <br/>
+          <Modal show={modalAberto} onHide={() => setModalAberto(false)}>
+            <Modal.Header closeButton>
+              <Modal.Title style={{fontWeight: "bold", color: "Grey"}}>{itemSelecionado ? "Editar Usuario" : "Novo Usuário"}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form onSubmit={handleEditar}>
+                <Form.Group controlId="nome" style={{marginBottom: "20px"}}>
+                  <Form.Label>Nome do Usuário</Form.Label>
+                  <Form.Control type="text" placeholder="Digite o nome do Usuário" value={nome} onChange={handleNomeChange} required
+                    isInvalid={formEnviado && nome.length < 5}/>
+                </Form.Group>
+                <Form.Group controlId="senha" style={{marginBottom: "20px"}}>
+                  <Form.Label>Senha</Form.Label>
+                  <Form.Control type="password" placeholder="Digite a nova senha" value={senha} onChange={handleSenhaChange} required minLength={5}
+                    isInvalid={formEnviado && senha.length < 5}/>
+                </Form.Group>
+                <Form.Group controlId="email" style={{marginBottom: "20px"}}>
+                  <Form.Label>Quantidade</Form.Label>
+                  <Form.Control type="email" placeholder="Digite o e-mail" value={email} onChange={handleEmailChange} required
+                    isInvalid={formEnviado && email.length < 8}/>
+                </Form.Group>
+                <Modal.Footer>
+                  <Button variant="success" type="submit">
+                    Salvar
+                  </Button>
+                  <Button variant="secondary" onClick={() => setModalAberto(false)}>Fechar</Button>
+                </Modal.Footer>
+              </Form>
+            </Modal.Body>  
+          </Modal>
+          <Toast show={showErrorToast} onClose={() => setShowErrorToast(false)} bg="danger" delay={3000} autohide>
+            <Toast.Body className="text-white">{errorMessage}</Toast.Body>
+          </Toast>
+          <Toast show={showSuccessToast} onClose={() => setShowSuccessToast(false)} bg="success" delay={3000} autohide>
+            <Toast.Body className="text-white">{successMessage}</Toast.Body>
+          </Toast>
+        </Col>
+      </Row> 
     </Container>
   );
 };

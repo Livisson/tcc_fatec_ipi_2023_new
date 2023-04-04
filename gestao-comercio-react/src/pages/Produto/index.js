@@ -12,7 +12,7 @@ import axios from "axios";
 
 const Produto = () => {
 
-  const [nomeProdutos, setNomeProdutos] = useState([]);
+  const [fornecedor, setFornecedor] = useState([]);
   const [itemSelecionado, setItemSelecionado] = useState(null);
   const [modalAberto, setModalAberto] = useState(false);
   const [modoEditar, setModoEditar] = useState(false);
@@ -24,16 +24,21 @@ const Produto = () => {
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
+  const [cnpj, setCNPJ] = useState("");
   const [nome, setNome] = useState("");
+
+  function handleCNPJChange(event) {
+    setCNPJ(event.target.value);
+  }
 
   function handleNomeChange(event) {
     setNome(event.target.value);
   }
 
-  function getNomeProdutos() {
-    axios.get('https://localhost:44334/NomeProdutos')
+  function getFornecedor() {
+    axios.get('https://localhost:44334/Fornecedor')
     .then(response => {
-      setNomeProdutos(response.data);
+      setFornecedor(response.data.filter(fornecedor => fornecedor.tipo !== "Geral"));
     })
     .catch(error => {
       console.log(error);
@@ -44,22 +49,24 @@ const Produto = () => {
     event.preventDefault();
 
 
-    const novoNomeProduto = {
-      nomeProduto: nome
+    const novoFornecedor = {
+      cnpj: cnpj,
+      nome: nome,
     };
 
-    axios.post("https://localhost:44334/NomeProdutos/", novoNomeProduto)
+    axios.post("https://localhost:44334/Fornecedor/", novoFornecedor)
     .then(response => {
-      getNomeProdutos();
-      setSuccessMessage("Nome de Produto inserido com Sucesso!")
+      getFornecedor();
+      setSuccessMessage("Fornecedor inserido com Sucesso!")
       setShowSuccessToast(true)
     })
     .catch(error => {
       console.log(error);
-      setErrorMessage(error.response.data.error || "Erro ao salvar Nome de Produto.")
+      setErrorMessage("Erro ao salvar fornecedor.")
       setShowErrorToast(true)
     });
 
+    setCNPJ("");
     setNome("");
     setModalAberto(false);
   }
@@ -67,24 +74,25 @@ const Produto = () => {
   const handleEditar = (event) => {
     event.preventDefault();
 
-    console.log(nomeProdutos)
-    const nomeProdutoEditado = {
-      id: itemSelecionado.id,
-      nomeProduto: nome,
+    console.log(fornecedor)
+    const fornecedorEditado = {
+      cnpj: itemSelecionado.cnpj,
+      nome: nome,
     };
   
-    axios.put("https://localhost:44334/NomeProdutos/", nomeProdutoEditado)
+    axios.put("https://localhost:44334/Fornecedor/", fornecedorEditado)
     .then(response => {
-      getNomeProdutos();
-      setSuccessMessage("Nome de Produto editado com sucesso!")
+      getFornecedor();
+      setSuccessMessage("Fornecedor editado com sucesso!")
       setShowSuccessToast(true)
     })
     .catch(error => {
       console.log(error);
-      setErrorMessage(error.response.data.error || "Erro ao editar Nome de Produto.")
+      setErrorMessage(error.message || "Erro ao editar fornecedor.")
       setShowErrorToast(true)
     });
   
+    setCNPJ("");
     setNome("");
     setItemSelecionado(null);
     setModalAberto(false);
@@ -93,15 +101,15 @@ const Produto = () => {
   function handleCloseDeleteConfirmation(confirmed) {
     if (confirmed) {
 
-      axios.delete(`https://localhost:44334/NomeProdutos/${itemToDelete.id}`)
+      axios.delete(`https://localhost:44334/Fornecedor/${itemToDelete.id}`)
         .then(response => {
-          getNomeProdutos();
-          setSuccessMessage("Nome de Produto excluído com sucesso!")
+          getFornecedor();
+          setSuccessMessage("Fornecedor excluído com sucesso!")
           setShowSuccessToast(true)
         })
         .catch(error => {
           console.log(error);
-          setErrorMessage(error.message || "Erro ao excluir Nome de Produto.")
+          setErrorMessage(error.message || "Erro ao excluir Fornecedor.")
           setShowErrorToast(true)
         });
     }
@@ -110,9 +118,9 @@ const Produto = () => {
   }
   
   useEffect(() => {
-    axios.get('https://localhost:44334/NomeProdutos')
+    axios.get('https://localhost:44334/Fornecedor')
       .then(response => {
-        setNomeProdutos(response.data);
+        setFornecedor(response.data.filter(fornecedor => fornecedor.tipo !== "Geral"));
       })
       .catch(error => {
         console.log(error);
@@ -121,20 +129,22 @@ const Produto = () => {
 
   const userToken = localStorage.getItem("user_token");
 
-  const adicionarNomeProduto = () => {
+  const adicionarFornecedor = () => {
+    setCNPJ("");
     setNome("");
     setModalAberto(true);
     setModoEditar(false);
   };
 
-  const editarNomeProduto = (item) => {
+  const editarFornecedor = (item) => {
     setItemSelecionado(item);
-    setNome(item.nomeProduto);
+    setCNPJ(item.cnpj);
+    setNome(item.nome);
     setModalAberto(true);
     setModoEditar(true);
   };
 
-  const removerNomeProduto = (item) => {
+  const removerFornecedor = (item) => {
     setItemToDelete(item);
     setShowDeleteConfirmation(true);
   };
@@ -193,27 +203,29 @@ const Produto = () => {
       <br/>
       <Row className="justify-content-md-center">
         <div className="d-flex justify-content-between">
-          <label style={{fontWeight: "bold", color: "Green"}}>Produtos</label>
-          <Button variant="warning" className="custom-button-add" style={{ height: "35px", width: "100px", marginBottom: "5px", color:"grey" }} onClick={() => adicionarNomeProduto()}>Adicionar</Button>
+          <label style={{fontWeight: "bold", color: "Green"}}>Fornecedores</label>
+          <Button variant="warning" className="custom-button-add" style={{ height: "35px", width: "100px", marginBottom: "5px", color:"grey" }} onClick={() => adicionarFornecedor()}>Adicionar</Button>
         </div>
       </Row>
       <Row>
         <Table striped hover>
           <thead>
             <tr>
-              <th className="text-center">Nome Produtos</th>
+              <th className="text-center">CNPJ</th>
+              <th>Fornecedor</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {nomeProdutos.map((item, index) => (
+            {fornecedor.map((item, index) => (
               <tr key={item.id}>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.nomeProduto}</td>
+                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.cnpj}</td>
+                <td style={{ verticalAlign: "middle"}}>{item.nome}</td>
                 <td className="text-center" style={{ verticalAlign: "middle"}}>
-                  <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => editarNomeProduto(item)}>
+                  <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => editarFornecedor(item)}>
                     <FaPencilAlt />
                   </Button>
-                  <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => removerNomeProduto(item)}>
+                  <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => removerFornecedor(item)}>
                     <FaTrash />
                   </Button>
                 </td>
@@ -225,13 +237,17 @@ const Produto = () => {
       <br/>
       <Modal show={modalAberto} onHide={() => setModalAberto(false)}>
         <Modal.Header closeButton>
-          <Modal.Title style={{fontWeight: "bold", color: "Grey"}}>{itemSelecionado ? "Editar Nome Produto" : "Novo Nome de Produto"}</Modal.Title>
+          <Modal.Title style={{fontWeight: "bold", color: "Grey"}}>{itemSelecionado ? "Editar Fornecedor" : "Novo Fornecedor"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={modoEditar ? handleEditar : handleAdicionar}>
+            <Form.Group controlId="CNPJ" style={{marginBottom: "20px"}}>
+              <Form.Label>CNPJ</Form.Label>
+              <Form.Control type="text" placeholder="Digite o CNPJ do fornecedor" value={cnpj} onChange={handleCNPJChange}/>
+            </Form.Group>
             <Form.Group controlId="nome" style={{marginBottom: "20px"}}>
               <Form.Label>Nome</Form.Label>
-              <Form.Control type="text" placeholder="Digite o nome do produto" value={nome} onChange={handleNomeChange} />
+              <Form.Control type="text" placeholder="Digite o nome do fornecedor" value={nome} onChange={handleNomeChange} />
             </Form.Group>
             <Modal.Footer>
               <Button variant="success" type="submit">
@@ -248,7 +264,7 @@ const Produto = () => {
             <Modal.Title>Confirmação de exclusão</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            Tem certeza que deseja excluir esse nome de produto?"{itemToDelete.nome}"?
+            Tem certeza que deseja excluir o fornecedor "{itemToDelete.nome}"?
           </Modal.Body>
           <Modal.Footer>
             <Button variant="danger" onClick={() => handleCloseDeleteConfirmation(true)}>

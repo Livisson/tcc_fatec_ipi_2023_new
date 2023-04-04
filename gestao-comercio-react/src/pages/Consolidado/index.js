@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from "react";
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
-import { FaUser, FaChartBar, FaMapMarkedAlt, FaClipboardList, FaBox, FaMoneyBillWave, FaCashRegister, FaCog, FaSignOutAlt} from "react-icons/fa";
+import { 
+  FaUser, 
+  FaChartBar, 
+  FaDollyFlatbed, 
+  FaFileInvoiceDollar,
+  FaClipboardList, 
+  FaBox, 
+  FaMoneyBillWave, 
+  FaCashRegister, 
+  FaCog, 
+  FaSignOutAlt
+} from "react-icons/fa";
 import { Link } from "react-router-dom";
 import LogoCompre from "../../LogoCompre.png";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -29,53 +40,14 @@ const Consolidado = () => {
     var anoMes = ano + mes.toString().padStart(2, "0");
     console.log(anoMes)
     axios
-      .get(`https://localhost:44334/Caixa/getConsolidado?data=${anoMes}`)
-      .then((response) => {
-        setEvents(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    .get(`https://localhost:44334/Caixa/getConsolidado?data=${anoMes}`)
+    .then((response) => {
+      setEvents(response.data);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   }, [currentDate]);
-
-  /*const events = [
-    {
-      title: 'Receita: R$5000,00',
-      start: new Date(2023, 2, 27, 9, 0),
-      end: new Date(2023, 2, 27, 10, 0),
-      tipo: 'positivo'
-    },
-    {
-      title: 'Despesa: R$3000,00',
-      start: new Date(2023, 2, 27, 10, 0),
-      end: new Date(2023, 2, 27, 11, 0),
-      tipo: 'negativo'
-    },
-    {
-      title: 'Resumo: R$3000,00',
-      start: new Date(2023, 2, 27, 11, 0),
-      end: new Date(2023, 2, 27, 12, 0),
-      tipo: 'positivo'
-    },
-    {
-      title: 'Receita: R$4000,00',
-      start: new Date(2023, 2, 28, 9, 0),
-      end: new Date(2023, 2, 28, 10, 0),
-      tipo: 'positivo'
-    },
-    {
-      title: 'Despesa: R$6000,00',
-      start: new Date(2023, 2, 28, 10, 0),
-      end: new Date(2023, 2, 28, 11, 0),
-      tipo: 'negativo'
-    },
-    {
-      title: 'Despesa: -R$2000,00',
-      start: new Date(2023, 2, 28, 11, 0),
-      end: new Date(2023, 2, 28, 12, 0),
-      tipo: 'negativo'
-    },
-  ];*/
 
   const messages = {
     allDay: 'Dia inteiro',
@@ -129,13 +101,13 @@ const Consolidado = () => {
   });
 
   return (
-    <Container style={{ backgroundColor: "white" }}>
+    <Container fluid style={{ backgroundColor: "white" }}>
       <Row className="justify-content-md-center">
-        <Col style={{textAlign: "left", verticalAlign: "middle", alignSelf: "center"}}>
-          <img src={LogoCompre} alt="Logo" height="80" style={{borderRadius: 7}}/>
-        </Col>
-        <Col style={{textAlign: "left", verticalAlign: "middle", alignSelf: "center"}} xs={6}><label style={{fontSize:22, fontWeight: "bold", color: "gray"}}>CONSOLIDADO: RECEITAS E DESPESAS</label></Col>
-        <Col style={{textAlign: "right", verticalAlign: "middle", alignSelf: "center"}}>
+        <img className="col-2 p-0" src={LogoCompre} alt="Logo" style={{borderRadius: 7, textAlign: "left", verticalAlign: "middle", alignSelf: "center"}}/>
+        <div className="col" style={{textAlign: "left", verticalAlign: "middle", alignSelf: "center"}} xs={6}>
+          <label style={{fontSize:22, fontWeight: "bold", color: "gray"}}>CONSOLIDADO</label>
+        </div>
+        <div className="col" style={{textAlign: "right", verticalAlign: "middle", alignSelf: "center"}}>
           <Row style={{ height: '50px'}}>
             <div className="mb-2">
               <DropdownButton
@@ -150,49 +122,92 @@ const Consolidado = () => {
                   </>
                 }
               >
-                <Dropdown.Item eventKey="1"><Link to="/config" style={{color: 'grey', textDecoration: 'none', display: 'flex', alignItems: 'center'}}><FaCog  className="me-2" />Configurações</Link></Dropdown.Item>
-                <Dropdown.Item eventKey="2"><Link to="/" style={{color: 'grey', textDecoration: 'none', display: 'flex', alignItems: 'center'}}><FaSignOutAlt  className="me-2" />Sair</Link></Dropdown.Item>
+                <Dropdown.Item eventKey="1">
+                  <Link to="/config" style={{color: 'grey', textDecoration: 'none', display: 'flex', alignItems: 'center'}}>
+                    <FaCog  className="me-2" />Configurações
+                  </Link>
+                </Dropdown.Item>
+                <Dropdown.Item eventKey="2">
+                  <Link to="/login" style={{color: 'grey', textDecoration: 'none', display: 'flex', alignItems: 'center'}}>
+                    <FaSignOutAlt  className="me-2" />Sair
+                  </Link>
+                </Dropdown.Item>
               </DropdownButton>
             </div>
           </Row>
+        </div>
+      </Row>
+      <Row className="justify-content-md-center">
+        <Col style={{backgroundColor: '#f8f9fa'}} xs={2} className="pt-4">
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/consolidado">
+                <FaChartBar className="me-2" />Consolidado
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/despesas">
+                <FaFileInvoiceDollar className="me-2" />Despesas
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/pedidos">
+                <FaClipboardList className="me-2" />Pedidos
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/fornecedores">
+                <FaDollyFlatbed className="me-2" />Fornecedores
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/estoque">
+                <FaBox className="me-2" />Estoque
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/precificar">
+                <FaMoneyBillWave className="me-2" />Precificação
+              </Link>
+            </Button>
+          </Row>
+          <Row>
+            <Button variant="light" className="custom-button-menu">
+              <Link style={{color: 'grey'}} className="nav-link" to="/caixa">
+                <FaCashRegister className="me-2" />Caixa
+              </Link>
+            </Button>
+          </Row>
+        </Col>
+        <Col className="pt-4">
+          <Calendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            views={['month']}
+            messages={messages}
+            eventPropGetter={eventStyleGetter}
+            style={{ height: 700 }}
+            showAllEvents={true}
+            dayLayoutAlgorithm={'no-overlap'}
+            onNavigate={handleNavigate}
+          />
         </Col>
       </Row>
       <br/>
-      <Row className="justify-content-md-center">
-        <div className="d-flex justify-content-between">
-          <Button variant="light" className="custom-button-menu-selected"><Link style={{color: 'grey'}} className="nav-link" to="/consolidado"><FaChartBar className="me-2" />Consolidado</Link></Button>
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/despesas"><FaMapMarkedAlt className="me-2" />Mapa de Custos</Link></Button>
-          <Dropdown className="d-inline-block">
-            <Dropdown.Toggle style={{color: 'grey'}} className="custom-button-menu" variant="light" id="dropdown-basic">
-              <FaClipboardList className="me-2" />Pedidos
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu>
-              <Dropdown.Item style={{color: 'grey'}}><Link style={{color: 'grey'}} className="nav-link" to="/pedidos">Pedidos</Link></Dropdown.Item>
-              <Dropdown.Item style={{color: 'grey'}}><Link style={{color: 'grey'}} className="nav-link" to="/fornecedores">Fornecedores</Link></Dropdown.Item>
-              {/*<Dropdown.Item style={{color: 'grey'}}><Link style={{color: 'grey'}} className="nav-link" to="/produtos">Produtos</Link></Dropdown.Item>*/}
-            </Dropdown.Menu>
-          </Dropdown>
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/estoque"><FaBox className="me-2" />Estoque</Link></Button>
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/precificar"><FaMoneyBillWave className="me-2" />Precificação</Link></Button>
-          <Button variant="light" className="custom-button-menu-last"><Link style={{color: 'grey'}} className="nav-link" to="/caixa"><FaCashRegister className="me-2" />Caixa</Link></Button>
-        </div>
-      </Row>
       <br/>
-      <br/>
-      <Calendar
-        localizer={localizer}
-        events={events}
-        startAccessor="start"
-        endAccessor="end"
-        views={['month']}
-        messages={messages}
-        eventPropGetter={eventStyleGetter}
-        style={{ height: 700 }}
-        showAllEvents={true}
-        dayLayoutAlgorithm={'no-overlap'}
-        onNavigate={handleNavigate}
-      />
+      
     </Container>
   );
 };
