@@ -127,6 +127,8 @@ const Fornecedor = () => {
       nome: nome,
     };
 
+    console.log(novoFornecedor);
+    
     axios.post("https://localhost:44334/Fornecedor/", novoFornecedor)
     .then(response => {
       getFornecedor();

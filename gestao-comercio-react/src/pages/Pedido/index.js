@@ -25,9 +25,7 @@ import axios from "axios";
 const Pedido = () => {
 
   const [pedido, setPedido] = useState([]);
-  //const [itemSelecionado, setItemSelecionado] = useState(null);
   const [modalAberto, setModalAberto] = useState(false);
-  //const [modoEditar, setModoEditar] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [fornecedores, setFornecedores] = useState([]);
@@ -77,9 +75,7 @@ const Pedido = () => {
       }
     }
 
-    if(event.target.value === "") {
-      setNomeProduto("");
-    }
+    if(event.target.value === "") setNomeProduto("");
   }
 
   function handleValorCompraChange(event) {
@@ -105,14 +101,13 @@ const Pedido = () => {
   }, [fornecedorFiltro]);
 
   const getProdutos = useCallback(() => {
-    axios
-      .get("https://localhost:44334/Pedido/getProdutos")
-      .then((response) => {
-        setProdutos([response.data]);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    axios.get("https://localhost:44334/Pedido/getProdutos")
+    .then((response) => {
+      setProdutos([response.data]);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   }, []);
 
   const handleAdicionar = (event) => {
@@ -155,7 +150,6 @@ const Pedido = () => {
   
   function handleCloseDeleteConfirmation(confirmed) {
     if (confirmed) {
-      
       const auxItemToDelete = {
         codigoFornecedor: fornecedores ? fornecedores.find(fornecedor => fornecedor.nome === itemToDelete.nomeFornecedor).cnpj : "",
         nomeProduto: itemToDelete.nomeProduto,
@@ -166,62 +160,57 @@ const Pedido = () => {
       };
 
       axios.post("https://localhost:44334/Pedido/deletePedido", auxItemToDelete)
-        .then(response => {
-          getPedido();
-          setSuccessMessage("Pedido excluído com sucesso!")
-          setShowSuccessToast(true)
-        })
-        .catch(error => {
-          console.log(error);
-          setErrorMessage(error.message || "Erro ao excluir Pedido.")
-          setShowErrorToast(true)
-        });
+      .then(response => {
+        getPedido();
+        setSuccessMessage("Pedido excluído com sucesso!")
+        setShowSuccessToast(true)
+      })
+      .catch(error => {
+        console.log(error);
+        setErrorMessage(error.message || "Erro ao excluir Pedido.")
+        setShowErrorToast(true)
+      });
     }
+
     setShowDeleteConfirmation(false);
     setItemToDelete(null);
   }
   
   useEffect(() => {
 
-    if (fornecedorFiltro !== "") {
-      getPedido();
-    }
+    if (fornecedorFiltro !== "") getPedido();
 
     const jsonGetInicial = {
       codigoFornecedor: ""
     };
   
     if (fornecedores.length === 0) {
-      axios
-        .get("https://localhost:44334/Pedido/", jsonGetInicial)
-        .then((response) => {
-          setPedido(response.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      axios.get("https://localhost:44334/Pedido/", jsonGetInicial)
+      .then((response) => {
+        setPedido(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     }
 
     if (fornecedores.length === 0) {
-      axios
-        .get("https://localhost:44334/Fornecedor")
-        .then((response) => {
-          setFornecedores(["", ...response.data]);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      axios.get("https://localhost:44334/Fornecedor")
+      .then((response) => {
+        setFornecedores(["", ...response.data]);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
-        axios
-        .get("https://localhost:44334/Pedido/getProdutos")
-        .then((response) => {
-          setProdutos([response.data]);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      axios.get("https://localhost:44334/Pedido/getProdutos")
+      .then((response) => {
+        setProdutos([response.data]);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     }
-
   }, [fornecedorFiltro, fornecedores, getPedido]);
 
   const userToken = localStorage.getItem("user_token");
@@ -234,20 +223,7 @@ const Pedido = () => {
     setQuantidade("");
     setDataPagamento("");
     setModalAberto(true);
-    //setModoEditar(false);
   };
-
-  /*const editarPedido = (item) => {
-    setItemSelecionado(item);
-    setCodigoFornecedor(item.codigoFornecedor);
-    setNomeProduto(item.nomeProduto);
-    setCodigoBarras(item.codigoBarras);
-    setValorCompra(item.valorCompra);
-    setQuantidade(item.quantidade);
-    setDataPagamento(item.dataPagamento);
-    setModalAberto(true);
-    setModoEditar(true);
-  };*/
 
   const removerPedido = (item) => {
     setItemToDelete(item);
@@ -500,9 +476,6 @@ const Pedido = () => {
           </Toast>
         </Col>
       </Row>
-      <br/>
-      <br/>
-        
     </Container>
   );
 };

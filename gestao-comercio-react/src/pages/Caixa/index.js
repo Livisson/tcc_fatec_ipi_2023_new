@@ -152,33 +152,36 @@ const Caixa = () => {
   };
 
   const handleFinalizarCaixa = () => {
-  
+    const caixa = []; // Cria uma lista vazia para os produtos a ser enviados
+    
     for (let i = 0; i < produtos.length; i++) {
       const produto = produtos[i];
       console.log("Finalizando");
       
-      const novoEnvio = {
+      const novo = {
         codigoBarras: produto.produto.codigoBarras,
         nomeProduto: produto.produto.nome,
         quantidade: parseInt(produto.quantidade),
       };
-
-      console.log(novoEnvio);
       
-      axios.post("https://localhost:44334/Caixa/", novoEnvio)
-      .then(response => {
-        console.log("Enviado");
-        console.log(response);
-      })
-      .catch(error => {
-        console.log("Não Enviado");
-        console.log(error);
-      });
+      caixa.push(novo); // Adiciona o produto à lista de envio do caixa
+      console.log(novo);
     }
-  
-    setProdutos([]);
-    setShowSuccessToast(true);
-    setSuccessMessage("Caixa finalizado com sucesso!");
+
+    console.log(caixa);
+
+    axios.post("https://localhost:44334/Caixa/", caixa) // Faz o post com a lista do caixa
+    .then(response => {
+      console.log("Enviado");
+      console.log(response);
+      setProdutos([]);
+      setShowSuccessToast(true);
+      setSuccessMessage("Caixa finalizado com sucesso!");
+    })
+    .catch(error => {
+      console.log("Não Enviado");
+      console.log(error);
+    });
     setShowFinalizarConfirmation(false);
   };
 
