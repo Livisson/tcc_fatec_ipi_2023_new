@@ -14,19 +14,17 @@ import { Link } from "react-router-dom";
 import LogoCompre from "../../LogoCompre.png";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
-import { Table, Button, Col, Row, Container, Form, Modal, InputGroup } from 'react-bootstrap';
+import { Table, Button, Col, Row, Container, Modal, Form, InputGroup, Toast } from 'react-bootstrap';
 import './styleCaixa.css';
 import axios from "axios";
 
 const Caixa = () => {
 
-  
-  const [itemSelecionado, setItemSelecionado] = useState(null);
-  const [caixaAberto, setCaixaAberto] = useState(false);
   const [showCancelarConfirmation, setShowCancelarConfirmation] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [produtoPesquisado, setProdutoPesquisado] = useState(null);
+  const [showFinalizarConfirmation, setShowFinalizarConfirmation] = useState(false);
 
   const [showErrorToast, setShowErrorToast] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -35,7 +33,8 @@ const Caixa = () => {
 
   const [barras, setBarras] = useState("");
   const [valor, setValor] = useState("");
-  const [quantidade, setQuantidade] = useState("");
+  const [quantidade, setQuantidade] = useState(1);
+  const [totalProdutoSelecionado, setTotalProdutoSelecionado] = useState(0);
   const [produtos, setProdutos] = useState([]);
   
   function handleBarrasChange(event) {
@@ -43,9 +42,8 @@ const Caixa = () => {
   }
 
   useEffect(() => {
-    if (!barras) {
-      return;
-    }
+    if (!barras) return;
+    
     axios
       .get(`https://localhost:44334/Caixa?request=${barras}`)
       .then((response) => {
@@ -68,12 +66,29 @@ const Caixa = () => {
       console.log("Entrou");
       console.log(response);
       const novoProduto = {
-        nome: response.data.nome,
-        codigoBarras: response.data.codigoBarras,
-        valor: Number(response.data.valorVenda),
+        produto: {
+          nome: response.data.nome,
+          codigoBarras: response.data.codigoBarras,
+          valor: Number(response.data.valorVenda),
+        },
+        quantidade: quantidade,
       };
+      
+      const produtoExistente = produtos.find(
+        (p) => p.produto.codigoBarras === novoProduto.produto.codigoBarras
+      );
+      if (produtoExistente) {
+        produtoExistente.quantidade += quantidade;
+        produtoExistente.total += Number(response.data.valorVenda) * quantidade;
+        setTotalProdutoSelecionado(produtoExistente.total);
+        setProdutos([...produtos]);
+      } 
+      else {
+        const novoTotal = Number(response.data.valorVenda) * quantidade;
+        setTotalProdutoSelecionado(novoTotal);
+        setProdutos([...produtos, { produto: novoProduto.produto, quantidade, total: novoTotal }]);
+      }
 
-      setProdutos([...produtos, novoProduto]);
       setSuccessMessage("Produto adicionado com sucesso.");
       setShowSuccessToast(true);
     })
@@ -85,6 +100,7 @@ const Caixa = () => {
     
     setProdutoPesquisado(null);
     setValor("");
+    setQuantidade(1);
     setBarras("");
   };
 
@@ -102,16 +118,14 @@ const Caixa = () => {
     setItemToDelete(null);
   }
 
-  function handleCancelarCompra(confirmed) {
-    if (confirmed) {
-      setProdutos([]);
-    }
-    setShowCancelarConfirmation(false);
-  }
-
   const cancelarCompra = () => {
     setShowCancelarConfirmation(true);
   };
+
+  function handleCancelarCompra(confirmed) {
+    if (confirmed) setProdutos([]);
+    setShowCancelarConfirmation(false);
+  }
   
   useEffect(() => {
     console.log("Entrou");
@@ -125,12 +139,47 @@ const Caixa = () => {
   }, []);
 
   const Total = ({ produtos }) => {
-    const total = produtos.reduce((total, produto) => total + produto.valor, 0);
+    const total = produtos.reduce((total, produto) => total + produto.produto.valor * produto.quantidade, 0);
     return (
       <div className="total">
-        <span>Total: R${total.toFixed(2)}</span>
+        <span>Total: R$ {total.toFixed(2)}</span>
       </div>
     );
+  };
+
+  const finalizarCaixa = (produto) => {
+    setShowFinalizarConfirmation(true);
+  };
+
+  const handleFinalizarCaixa = () => {
+  
+    for (let i = 0; i < produtos.length; i++) {
+      const produto = produtos[i];
+      console.log("Finalizando");
+      
+      const novoEnvio = {
+        codigoBarras: produto.produto.codigoBarras,
+        nomeProduto: produto.produto.nome,
+        quantidade: parseInt(produto.quantidade),
+      };
+
+      console.log(novoEnvio);
+      
+      axios.post("https://localhost:44334/Caixa/", novoEnvio)
+      .then(response => {
+        console.log("Enviado");
+        console.log(response);
+      })
+      .catch(error => {
+        console.log("Não Enviado");
+        console.log(error);
+      });
+    }
+  
+    setProdutos([]);
+    setShowSuccessToast(true);
+    setSuccessMessage("Caixa finalizado com sucesso!");
+    setShowFinalizarConfirmation(false);
   };
 
   const userToken = localStorage.getItem("user_token");
@@ -178,10 +227,8 @@ const Caixa = () => {
           </Row>
         </div>
       </Row>
-      <br/>
-      <br/>
-      <Row>
-        <Col>
+      <Row className="pt-4 ">
+        <Col className="ps-4 pe-3" xs={9} style={{ verticalAlign: "middle", textAlign: "center"}}>
           <Row>
             <Table striped hover>
               <thead>
@@ -191,7 +238,6 @@ const Caixa = () => {
                   <th className="text-center">DESCRIÇÃO</th>
                   <th className="text-center">QUANT.</th>
                   <th className="text-center">UNIT.</th>
-                  <th className="text-center">DESC. %</th>
                   <th className="text-center">R$ FINAL</th>
                   <th></th>
                 </tr>
@@ -200,12 +246,11 @@ const Caixa = () => {
                 {produtos.map((produto, index) => (
                   <tr key={index}>
                     <td>{index}</td>
-                    <td>{produto.codigoBarras}</td>
-                    <td>{produto.nome}</td>
-                    <td></td>
-                    <td>R$ {produto.valor},00</td>
-                    <th></th>
-                    <th></th>
+                    <td>{produto.produto.codigoBarras}</td>
+                    <td style={{ textAlign: "left"}}>{produto.produto.nome}</td>
+                    <td>{produto.quantidade}</td>
+                    <td>R$ {produto.produto.valor.toFixed(2)}</td>
+                    <th>R$ {produto.total.toFixed(2)}</th>
                     <th>
                       <Button 
                       variant="outline-secondary" 
@@ -223,17 +268,15 @@ const Caixa = () => {
         </Col>
         <Col xs={3} style={{ verticalAlign: "middle", textAlign: "center"}}>
           <Form.Label>Códigos de Barras</Form.Label>
-          
           <InputGroup id="barras" className="mb-3">
             <InputGroup.Text id="basic-addon1"><FaBarcode/></InputGroup.Text>
             <Form.Control
+              value={barras}
               as={InputMask}
               mask="9999999999999"
-              alwaysShowMask
-              value={barras}
+              maskChar={null}
               onChange={handleBarrasChange}
-            >
-            </Form.Control>
+            />
           </InputGroup>
           <Form.Label>Nome do Produto</Form.Label>
           <InputGroup id="nome" className="mb-3">
@@ -248,8 +291,14 @@ const Caixa = () => {
           <Row>
             <Col>
               <Form.Label>Quantidade</Form.Label>
-              <InputGroup className="mb-3">
-                <Form.Control placeholder=""/>
+              <InputGroup id="qnt" className="mb-3">
+                <Form.Control
+                  type="number"
+                  min="1"
+                  id="qnt"
+                  value={quantidade}
+                  onChange={(event) => setQuantidade(parseInt(event.target.value))}
+                />
               </InputGroup>
             </Col>
             <Col>
@@ -258,7 +307,7 @@ const Caixa = () => {
                 <Form.Control placeholder=""/>
               </InputGroup> */}
               <InputGroup className="mb-3">
-                <InputGroup.Text id="valor">R$</InputGroup.Text>
+                <InputGroup.Text id="valor">R$ </InputGroup.Text>
                 <Form.Control
                   type="text"
                   aria-label="Valor do produto"
@@ -280,7 +329,7 @@ const Caixa = () => {
             </Button>
           </Row>
           <Row className="mt-4 mb-3 ps-3 pe-3">
-            <Button variant="success" size="sm">
+            <Button variant="success" size="sm" onClick={finalizarCaixa}>
               FINALIZAR COMPRA
             </Button>
           </Row>
@@ -292,7 +341,7 @@ const Caixa = () => {
             <Modal.Title>Confirmação de exclusão</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            Tem certeza que deseja retirar o produto "{itemToDelete.nome}" do caixa?
+            Tem certeza que deseja retirar o produto "{itemToDelete.produto.nome}" do caixa?
           </Modal.Body>
           <Modal.Footer>
             <Button variant="danger" onClick={() => handleDeletarProduto(true)}>
@@ -322,6 +371,30 @@ const Caixa = () => {
           </Modal.Footer>
         </Modal>
       )}
+      {showFinalizarConfirmation && (
+        <Modal show={showFinalizarConfirmation} onHide={() => handleFinalizarCaixa(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Confirmação de Finalização</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            Tem certeza que deseja finalizar a compra?
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="danger" onClick={() => handleFinalizarCaixa(true)}>
+              Confirmar
+            </Button>
+            <Button variant="secondary" onClick={() => handleFinalizarCaixa(false)}>
+              Cancelar
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
+      <Toast show={showErrorToast} onClose={() => setShowErrorToast(false)} bg="danger" delay={3000} autohide>
+            <Toast.Body className="text-white">{errorMessage}</Toast.Body>
+          </Toast>
+          <Toast show={showSuccessToast} onClose={() => setShowSuccessToast(false)} bg="success" delay={3000} autohide>
+            <Toast.Body className="text-white">{successMessage}</Toast.Body>
+          </Toast>
     </Container>
   );
 };
