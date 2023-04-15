@@ -7,6 +7,7 @@ using GestaoComercio.WebUI.Models.Usuario.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,10 +24,10 @@ namespace GestaoComercio.WebUI.Controllers
         private readonly IMapper _mapper;
         private readonly IGenericRepository<Usuario> _usuarioRepository;
 
-        public UsuarioController(IMapper mapper, IGenericRepository<Usuario> usuarioRepository)
+        public UsuarioController(IMapper mapper, IGenericRepository<Usuario> usuarioRepository, IConfiguration configuration)
         {
             _mapper = mapper;
-            _usuarioService = new UsuarioService(usuarioRepository, mapper);
+            _usuarioService = new UsuarioService(usuarioRepository, mapper, configuration);
         }
 
 

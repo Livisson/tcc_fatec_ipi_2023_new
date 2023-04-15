@@ -39,7 +39,7 @@ namespace GestaoComercio.Application.Services
                     CodigoBarras = request.CodigoBarras,
                     FornecedorCpnj = request.CodigoFornecedor,
                     Nome = request.NomeProduto,
-                    PerDesconto = 5,
+                    PerDesconto = 0,
                     PerMargem = 10,
                     QtdEstoqueTotal = request.Quantidade,
                     ValorSugerido = request.ValorCompra + (request.ValorCompra * 0.1),
@@ -103,11 +103,11 @@ namespace GestaoComercio.Application.Services
             var pedidos = new List<Pedido>();
             if (codigoFornecedor == "" || codigoFornecedor == null || codigoFornecedor == "undefined")
             {
-                pedidos = _pedidoRepository.GetAsync().Result.ToList();
+                pedidos = _pedidoRepository.GetAsync().Result.OrderBy(x => x.DataVencimento).ToList();
             }
             else
             {
-                pedidos = _pedidoRepository.GetAll(x => x.CodigoFornecedorProduto == codigoFornecedor).ToList();
+                pedidos = _pedidoRepository.GetAll(x => x.CodigoFornecedorProduto == codigoFornecedor).OrderBy(x => x.DataVencimento).ToList();
             }
             
             List<TelaPedidoResponse> list = new List<TelaPedidoResponse>();

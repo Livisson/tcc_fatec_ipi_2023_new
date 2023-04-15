@@ -15,16 +15,28 @@ const Signin = () => {
   const { signin, signout } = useAuth();
   const navigate = useNavigate();
 
+  
+
   useEffect(() => {
     console.log("Entrou")
+    console.log(localStorage.getItem("selectedWindow"))
+    console.log(localStorage.getItem("selectedWindow") === "home");
+    
+    if (localStorage.getItem("selectedWindow") === "home") {
+      signout();
+    }
+
     window.addEventListener('popstate', () => {
-      console.log("Logout")
-      signout()
+      localStorage.setItem("selectedWindow", "home");
+      //signout()
     });
     return () => {
       window.removeEventListener('popstate', () => {
-        signout()
+      localStorage.setItem("selectedWindow", "home");
+        //signout()
     })};
+
+    
   }, []);
 
   const [nome, setNome] = useState("");

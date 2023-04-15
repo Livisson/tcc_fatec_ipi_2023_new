@@ -26,6 +26,7 @@ const Config = () => {
   const [senha, setSenha] = useState("");
   const [email, setEmail] = useState("");
 
+  localStorage.setItem("selectedWindow", "config");
 
   function handleNomeChange(event) {
     setNome(event.target.value);
@@ -136,8 +137,8 @@ const Config = () => {
       <br/>
       <Row className="justify-content-md-center">
         <div className="d-flex justify-content-between">
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/consolidado"><FaChartBar className="me-2" />Consolidado</Link></Button>
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/despesas"><FaMapMarkedAlt className="me-2" />Mapa de Custos</Link></Button>
+          <Button variant="light" className="custom-button-menu"><Link style={{ color: 'grey', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flex: 1 }} className="nav-link" to="/consolidado"><FaChartBar className="me-2" />Consolidado</Link></Button>
+          <Button variant="light" className="custom-button-menu"><Link style={{ color: 'grey', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flex: 1 }} className="nav-link" to="/despesas"><FaMapMarkedAlt className="me-2" />Mapa de Custos</Link></Button>
           <Dropdown className="d-inline-block">
             <Dropdown.Toggle style={{color: 'grey'}} className="custom-button-menu" variant="light" id="dropdown-basic">
               <FaClipboardList className="me-2" />Produtos
@@ -148,9 +149,9 @@ const Config = () => {
               <Dropdown.Item style={{color: 'grey'}}><Link style={{color: 'grey'}} className="nav-link" to="/fornecedores">Fornecedores</Link></Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/estoque"><FaBox className="me-2" />Estoque</Link></Button>
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/precificar"><FaMoneyBillWave className="me-2" />Precificação</Link></Button>
-          <Button variant="light" className="custom-button-menu-last"><Link style={{color: 'grey'}} className="nav-link" to="/caixa"><FaCashRegister className="me-2" />Caixa</Link></Button>
+          <Button variant="light" className="custom-button-menu"><Link style={{ color: 'grey', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flex: 1 }} className="nav-link" to="/estoque"><FaBox className="me-2" />Estoque</Link></Button>
+          <Button variant="light" className="custom-button-menu"><Link style={{ color: 'grey', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flex: 1 }} className="nav-link" to="/precificar"><FaMoneyBillWave className="me-2" />Precificação</Link></Button>
+          <Button variant="light" className="custom-button-menu-last"><Link style={{ color: 'grey', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flex: 1 }} className="nav-link" to="/caixa"><FaCashRegister className="me-2" />Caixa</Link></Button>
         </div>
       </Row>
       <br/>

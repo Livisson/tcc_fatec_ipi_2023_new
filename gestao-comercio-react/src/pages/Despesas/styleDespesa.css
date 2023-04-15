@@ -2,10 +2,18 @@
   margin-right: 5px;
   width: 200px;
   height: 60px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .custom-button-menu-last {
   width: 200px;
   height: 60px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .custom-button-menu-selected{
@@ -13,6 +21,10 @@
   color: 'grey';
   width: 200px;
   height: 60px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .custom-button-menu-selected:hover {

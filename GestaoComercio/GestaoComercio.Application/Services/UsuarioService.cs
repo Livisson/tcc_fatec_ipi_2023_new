@@ -13,6 +13,8 @@ using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
+using DotEnv;
+using Microsoft.Extensions.Configuration;
 
 namespace GestaoComercio.Application.Services
 {
@@ -21,11 +23,13 @@ namespace GestaoComercio.Application.Services
 
         private readonly IGenericRepository<Usuario> _usuarioRepository;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
 
-        public UsuarioService(IGenericRepository<Usuario> usuarioRepository, IMapper mapper)
+        public UsuarioService(IGenericRepository<Usuario> usuarioRepository, IMapper mapper, IConfiguration configuration)
         {
             _usuarioRepository = usuarioRepository;
             _mapper = mapper;
+            _configuration = configuration;
         }
 
         public UsuarioDTO GetUsuarioByIndex(string nome, string senha)
@@ -56,10 +60,11 @@ namespace GestaoComercio.Application.Services
             try
             {
                 var usuario = await _usuarioRepository.GetAsync();
-
+                ;
                 // Configura as informações do remetente
                 string remetente = "provap2pweb@outlook.com";
-                string senha = "Pwebp22022";
+                //string senha = "Pwebp22022";
+                string senha = _configuration.GetSection("EmailConfig").Value;
                 //string destinatario = "gestaocomercio.tccfatec@gmail.com";
                 string destinatario = usuario.FirstOrDefault().Email;
                 string assunto = "Recuperar Senha - Sistema Gestão de Comércio";

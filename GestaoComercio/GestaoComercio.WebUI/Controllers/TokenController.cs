@@ -7,6 +7,7 @@ using GestaoComercio.WebUI.TokenManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +22,10 @@ namespace GestaoComercio.WebUI.Controllers
         private readonly IJwtTokenManager _tokenManager;
         private readonly UsuarioService _usuarioService;
         private readonly IMapper _mapper;
-        public TokenController(IJwtTokenManager jwtTokenManager, IMapper mapper, IGenericRepository<Usuario> usuarioRepository)
+        public TokenController(IJwtTokenManager jwtTokenManager, IMapper mapper, IGenericRepository<Usuario> usuarioRepository, IConfiguration configuration)
         {
             _tokenManager = jwtTokenManager;
-            _usuarioService = new UsuarioService(usuarioRepository, mapper);
+            _usuarioService = new UsuarioService(usuarioRepository, mapper, configuration);
         }
 
         [AllowAnonymous]

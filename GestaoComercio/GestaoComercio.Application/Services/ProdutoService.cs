@@ -155,7 +155,7 @@ namespace GestaoComercio.Application.Services
             return _mapper.Map<ProdutoDTO>(_produtoRepository.UpdateAsync(_mapper.Map<Produto>(entity)).Result);
         }
 
-        public ProdutoDTO UpdateValoresVenda(PostPrecificacaoCommand produtoParaAtualizar)
+        public async Task<ProdutoDTO> UpdateValoresVenda(PostPrecificacaoCommand produtoParaAtualizar)
         {
             var entity = _produtoRepository.Get(x => x.CodigoBarras == produtoParaAtualizar.CodigoBarras && x.FornecedorCpnj == produtoParaAtualizar.CodigoFornecedor);
 
@@ -166,7 +166,11 @@ namespace GestaoComercio.Application.Services
             //return _mapper.Map<ProdutoDTO>(entity);
             entity.Fornecedor = null;
             entity.EspecificacoesDeProduto = null;
-            return _mapper.Map<ProdutoDTO>(_produtoRepository.UpdateAsync(entity).Result);
+            await _produtoRepository.UpdateAsync(entity);
+            var produto = GetProdutoByIndex(produtoParaAtualizar.CodigoBarras, produtoParaAtualizar.CodigoFornecedor);
+            produto.RegraNegocio();
+            Update(produto);
+            return produto;
         }
 
         public async Task<ProdutoDTO> DeletarProduto(ProdutoDTO request)

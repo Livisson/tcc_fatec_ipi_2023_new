@@ -40,6 +40,7 @@ const Precificar = () => {
   const [valorSugerido, setValorSugerido] = useState("");
   const [valorVenda, setValorVenda] = useState("");
 
+  localStorage.setItem("selectedWindow", "precificar");
 
   function handlePerDescontoChange(event) {
     setPerDesconto(event.target.value);
@@ -164,7 +165,7 @@ const Precificar = () => {
         <Col style={{textAlign: "left", verticalAlign: "middle", alignSelf: "center"}}>
           <img src={LogoCompre} alt="Logo" height="80" style={{borderRadius: 7}}/>
         </Col>
-        <Col style={{textAlign: "left", verticalAlign: "middle", alignSelf: "center"}} xs={6}><label style={{fontSize:22, fontWeight: "bold", color: "gray"}}>PEDIDOS</label></Col>
+        <Col style={{textAlign: "left", verticalAlign: "middle", alignSelf: "center"}} xs={6}><label style={{fontSize:22, fontWeight: "bold", color: "gray"}}>PRECIFICAÇÃO</label></Col>
         <Col style={{textAlign: "right", verticalAlign: "middle", alignSelf: "center"}}>
           <Row style={{ height: '50px'}}>
             <div className="mb-2">
@@ -190,8 +191,8 @@ const Precificar = () => {
       <br/>
       <Row className="justify-content-md-center">
         <div className="d-flex justify-content-between">
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/consolidado"><FaChartBar className="me-2" />Consolidado</Link></Button>
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/despesas"><FaMapMarkedAlt className="me-2" />Mapa de Custos</Link></Button>
+          <Button variant="light" className="custom-button-menu"><Link style={{ color: 'grey', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flex: 1 }} className="nav-link" to="/consolidado"><FaChartBar className="me-2" />Consolidado</Link></Button>
+          <Button variant="light" className="custom-button-menu"><Link style={{ color: 'grey', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flex: 1 }} className="nav-link" to="/despesas"><FaMapMarkedAlt className="me-2" />Mapa de Custos</Link></Button>
           <Dropdown className="d-inline-block">
             <Dropdown.Toggle style={{color: 'grey'}} className="custom-button-menu" variant="light" id="dropdown-basic">
               <FaClipboardList className="me-2" />Pedidos
@@ -203,9 +204,9 @@ const Precificar = () => {
               {/*<Dropdown.Item style={{color: 'grey'}}><Link style={{color: 'grey'}} className="nav-link" to="/produtos">Produtos</Link></Dropdown.Item>*/}
             </Dropdown.Menu>
           </Dropdown>
-          <Button variant="light" className="custom-button-menu"><Link style={{color: 'grey'}} className="nav-link" to="/estoque"><FaBox className="me-2" />Estoque</Link></Button>
-          <Button variant="light" className="custom-button-menu-selected"><Link style={{color: 'grey'}} className="nav-link" to="/precificar"><FaMoneyBillWave className="me-2" />Precificação</Link></Button>
-          <Button variant="light" className="custom-button-menu-last"><Link style={{color: 'grey'}} className="nav-link" to="/caixa"><FaCashRegister className="me-2" />Caixa</Link></Button>
+          <Button variant="light" className="custom-button-menu"><Link style={{ color: 'grey', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flex: 1 }} className="nav-link" to="/estoque"><FaBox className="me-2" />Estoque</Link></Button>
+          <Button variant="light" className="custom-button-menu-selected"><Link style={{ color: 'grey', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flex: 1 }} className="nav-link" to="/precificar"><FaMoneyBillWave className="me-2" />Precificação</Link></Button>
+          <Button variant="light" className="custom-button-menu-last"><Link style={{ color: 'grey', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flex: 1 }} className="nav-link" to="/caixa"><FaCashRegister className="me-2" />Caixa</Link></Button>
         </div>
       </Row>
       <br/>
@@ -270,7 +271,7 @@ const Precificar = () => {
       <br/>
       <Modal show={modalAberto} onHide={() => setModalAberto(false)}>
         <Modal.Header closeButton>
-          <Modal.Title style={{fontWeight: "bold", color: "Grey"}}>{"Novo Pedido"}</Modal.Title>
+          <Modal.Title style={{fontWeight: "bold", color: "Grey"}}>{"Editar Preço"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleEditar}>

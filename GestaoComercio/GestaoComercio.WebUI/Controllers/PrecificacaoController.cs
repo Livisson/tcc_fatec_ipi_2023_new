@@ -39,9 +39,9 @@ namespace GestaoComercio.WebUI.Controllers
         }
 
         [HttpPut]
-        public IActionResult PostPrecificacao(PostPrecificacaoModel request)
+        public async Task<IActionResult> PostPrecificacao(PostPrecificacaoModel request)
         {
-            _produtoService.UpdateValoresVenda(_mapper.Map<PostPrecificacaoCommand>(request));
+            await _produtoService.UpdateValoresVenda(_mapper.Map<PostPrecificacaoCommand>(request));
             return Ok();
         }
 

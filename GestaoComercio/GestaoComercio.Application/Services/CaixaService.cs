@@ -22,12 +22,13 @@ namespace GestaoComercio.Application.Services
         private readonly IGenericRepository<Despesa> _despesaRepository;
         private readonly IGenericRepository<DespesaHistorico> _despesaHistoricoRepository;
         private readonly IGenericRepository<ProdutosVenda> _produtosVendaRepository;
+        private readonly IGenericRepository<Pedido> _pedidoRepository;
         private readonly EspecificacoesProdutoService _especificacoesProdutoService;
         private readonly IGenericRepository<Caixa> _caixaRepository;
         private readonly ProdutoService _produtoService;
         private readonly IMapper _mapper;
 
-        public CaixaService(ProdutoService produtoService, IGenericRepository<Produto> produtoRepository, IGenericRepository<ProdutosVenda> produtosVendaRepository, IGenericRepository<Caixa> caixaRepository, EspecificacoesProdutoService especificacoesProdutoService, IGenericRepository<Despesa> despesaRepository, IMapper mapper, IGenericRepository<DespesaHistorico> despesaHistoricoRepository)
+        public CaixaService(ProdutoService produtoService, IGenericRepository<Produto> produtoRepository, IGenericRepository<ProdutosVenda> produtosVendaRepository, IGenericRepository<Caixa> caixaRepository, EspecificacoesProdutoService especificacoesProdutoService, IGenericRepository<Despesa> despesaRepository, IMapper mapper, IGenericRepository<DespesaHistorico> despesaHistoricoRepository, IGenericRepository<Pedido> pedidoRepository)
         {
             _produtoService = produtoService;
             _produtoRepository = produtoRepository;
@@ -37,6 +38,7 @@ namespace GestaoComercio.Application.Services
             _despesaRepository = despesaRepository;
             _mapper = mapper;
             _despesaHistoricoRepository = despesaHistoricoRepository;
+            _pedidoRepository = pedidoRepository;
         }
         public async Task<IEnumerable<ProdutosVendaDTO>> InserirCompra(List<PostCaixaCommand> request)
         {
@@ -119,15 +121,24 @@ namespace GestaoComercio.Application.Services
 
             int year = Int32.Parse(mesAno.ToString().Substring(0, 4));
             int month = Int32.Parse(mesAno.ToString().Substring(4, 2));
-            
+
+            DateTime dataInicial = new DateTime(year, month, 1, 0, 0, 0);
+            DateTime dataFinal = new DateTime(year, month, DateTime.DaysInMonth(year, month), 23, 59, 59);
+
             for (int i = 1; i <= DateTime.DaysInMonth(year, month); i++)
             {
                 if (month == DateTime.Now.Month)//Se o mes for mes atual da pesquisa
                 {
                     if (i > DateTime.Now.Day)//Se o dia for maior que hoje
                     {
-                        var vendas = 10; //media diaria de vendas
-                        var despesas = _despesaHistoricoRepository.GetAll(x => x.DiaVencimento == i).ToList().Count == 0 ? 0 : _despesaHistoricoRepository.GetAll(x => x.DiaVencimento == i).ToList().Sum(x => x.Valor);
+                        var vendas = _caixaRepository.GetAll(x => x.DataVenda >= dataInicial.AddMonths(-3) && x.DataVenda <= dataFinal && x.DataVenda.Day == i).ToList().Count == 0 ? 0 : _caixaRepository.GetAll(x => x.DataVenda >= dataInicial.AddMonths(-3) && x.DataVenda <= dataFinal && x.DataVenda.Day == i).ToList().Average(x => x.ValorVenda); //media diaria de vendas
+                        var despesas = _despesaHistoricoRepository.GetAll(x => x.DataHistorico >= dataInicial && x.DataHistorico <= dataFinal && x.DiaVencimento == i).ToList().Count == 0 ? 0 : _despesaHistoricoRepository.GetAll(x => x.DataHistorico >= dataInicial && x.DataHistorico <= dataFinal && x.DiaVencimento == i).ToList().Sum(x => x.Valor);
+                        var pedidos = _pedidoRepository.GetAll(x => x.DataVencimento >= new DateTime(year, month, i, 0, 0, 0) && x.DataVencimento <= new DateTime(year, month, i, 23, 59, 59));
+                        var somaPorItem = pedidos.Select(pedido => new { Item = pedido.CodigoBarrasProduto, Soma = pedido.ValorCompra * pedido.Quantidade })
+                            .GroupBy(p => p.Item)
+                            .Select(g => new { Item = g.Key, Soma = g.Sum(p => p.Soma) });
+                        var valorSomaPedidos = somaPorItem.Count() == 0 ? 0 : somaPorItem.Sum(x => x.Soma);
+                        despesas = despesas + valorSomaPedidos;
                         var resumo = vendas - despesas;
 
                         string appObj = "{'Data':'"+ new DateTime(year, month, i, 0, 0, 0).ToString("dd/MM/yyyy") + "', 'Receitas':'" + vendas + "', 'Despesa':'" + despesas + "', 'Resumo':'" + resumo + "'}";
@@ -137,7 +148,7 @@ namespace GestaoComercio.Application.Services
                             Title = "R R$" + vendas.ToString("N2"),
                             Start = new DateTime(year, month, i, 0, 0, 0),
                             End = new DateTime(year, month, i, 0, 0, 0),
-                            Tipo = vendas >= 0 ? "positivo" : "negativo"
+                            Tipo = vendas >= 0 ? "positivoFuturo" : "negativo"
                         };
                         json.Add(registroReceita);
 
@@ -155,14 +166,20 @@ namespace GestaoComercio.Application.Services
                             Title = "S R$" + resumo.ToString("N2"),
                             Start = new DateTime(year, month, i, 0, 0, 0),
                             End = new DateTime(year, month, i, 0, 0, 0),
-                            Tipo = resumo >= 0 ? "positivo" : "negativo"
+                            Tipo = resumo >= 0 ? "positivoFuturo" : "negativo"
                         };;
                         json.Add(registroSaldo);
                     }
                     else
                     {
                         var vendas = _caixaRepository.GetAll(x => x.DataVenda >= new DateTime(year, month, i, 0, 0, 0) && x.DataVenda <= new DateTime(year, month, i, 23, 59, 59)).ToList().Count == 0 ? 0 : _caixaRepository.GetAll(x => x.DataVenda >= new DateTime(year, month, i, 0, 0, 0) && x.DataVenda <= new DateTime(year, month, i, 23, 59, 59)).ToList().Sum(x => x.ValorVenda);
-                        var despesas = _despesaHistoricoRepository.GetAll(x => x.DiaVencimento == i).ToList().Count == 0 ? 0 : _despesaHistoricoRepository.GetAll(x => x.DiaVencimento == i).ToList().Sum(x => x.Valor);
+                        var despesas = _despesaHistoricoRepository.GetAll(x => x.DataHistorico >= dataInicial && x.DataHistorico <= dataFinal && x.DiaVencimento == i).ToList().Count == 0 ? 0 : _despesaHistoricoRepository.GetAll(x => x.DataHistorico >= dataInicial && x.DataHistorico <= dataFinal && x.DiaVencimento == i).ToList().Sum(x => x.Valor);
+                        var pedidos = _pedidoRepository.GetAll(x => x.DataVencimento >= new DateTime(year, month, i, 0, 0, 0) && x.DataVencimento <= new DateTime(year, month, i, 23, 59, 59));
+                        var somaPorItem = pedidos.Select(pedido => new { Item = pedido.CodigoBarrasProduto, Soma = pedido.ValorCompra * pedido.Quantidade })
+                            .GroupBy(p => p.Item)
+                            .Select(g => new { Item = g.Key, Soma = g.Sum(p => p.Soma) });
+                        var valorSomaPedidos = somaPorItem.Count() == 0 ? 0 : somaPorItem.Sum(x => x.Soma);
+                        despesas = despesas + valorSomaPedidos;
                         var resumo = vendas - despesas;
 
                         string appObj = "{'Data':'" + new DateTime(year, month, i, 0, 0, 0).ToString("dd/MM/yyyy") + "', 'Receitas':'" + vendas + "', 'Despesa':'" + despesas + "', 'Resumo':'" + resumo + "'}";
@@ -195,10 +212,57 @@ namespace GestaoComercio.Application.Services
                         json.Add(registroSaldo);
                     }
                 }
+                else if (month > DateTime.Now.Month)
+                {
+                    var vendas = _caixaRepository.GetAll(x => x.DataVenda >= dataInicial.AddMonths(-3) && x.DataVenda <= dataFinal && x.DataVenda.Day == i).ToList().Count == 0 ? 0 : _caixaRepository.GetAll(x => x.DataVenda >= dataInicial.AddMonths(-3) && x.DataVenda <= dataFinal && x.DataVenda.Day == i).ToList().Average(x => x.ValorVenda); //media diaria de vendas
+                    var despesas = _despesaHistoricoRepository.GetAll(x => x.DataHistorico >= dataInicial && x.DataHistorico <= dataFinal && x.DiaVencimento == i).ToList().Count == 0 ? 0 : _despesaHistoricoRepository.GetAll(x => x.DataHistorico >= dataInicial && x.DataHistorico <= dataFinal && x.DiaVencimento == i).ToList().Sum(x => x.Valor);
+                    var pedidos = _pedidoRepository.GetAll(x => x.DataVencimento >= new DateTime(year, month, i, 0, 0, 0) && x.DataVencimento <= new DateTime(year, month, i, 23, 59, 59));
+                    var somaPorItem = pedidos.Select(pedido => new { Item = pedido.CodigoBarrasProduto, Soma = pedido.ValorCompra * pedido.Quantidade })
+                        .GroupBy(p => p.Item)
+                        .Select(g => new { Item = g.Key, Soma = g.Sum(p => p.Soma) });
+                    var valorSomaPedidos = somaPorItem.Count() == 0 ? 0 : somaPorItem.Sum(x => x.Soma);
+                    despesas = despesas + valorSomaPedidos;
+                    var resumo = vendas - despesas;
+
+                    string appObj = "{'Data':'" + new DateTime(year, month, i, 0, 0, 0).ToString("dd/MM/yyyy") + "', 'Receitas':'" + vendas + "', 'Despesa':'" + despesas + "', 'Resumo':'" + resumo + "'}";
+
+                    TelaConsolidadoResponse registroReceita = new TelaConsolidadoResponse
+                    {
+                        Title = "R R$" + vendas.ToString("N2"),
+                        Start = new DateTime(year, month, i, 0, 0, 0),
+                        End = new DateTime(year, month, i, 0, 0, 0),
+                        Tipo = vendas >= 0 ? "positivoFuturo" : "negativo"
+                    };
+                    json.Add(registroReceita);
+
+                    TelaConsolidadoResponse registroDespesa = new TelaConsolidadoResponse
+                    {
+                        Title = "D R$" + despesas.ToString("N2"),
+                        Start = new DateTime(year, month, i, 0, 0, 0),
+                        End = new DateTime(year, month, i, 0, 0, 0),
+                        Tipo = "negativo"
+                    };
+                    json.Add(registroDespesa);
+
+                    TelaConsolidadoResponse registroSaldo = new TelaConsolidadoResponse
+                    {
+                        Title = "S R$" + resumo.ToString("N2"),
+                        Start = new DateTime(year, month, i, 0, 0, 0),
+                        End = new DateTime(year, month, i, 0, 0, 0),
+                        Tipo = resumo >= 0 ? "positivoFuturo" : "negativo"
+                    }; ;
+                    json.Add(registroSaldo);
+                }
                 else
                 {
                     var vendas = _caixaRepository.GetAll(x => x.DataVenda >= new DateTime(year, month, i, 0, 0, 0) && x.DataVenda <= new DateTime(year, month, i, 23, 59, 59)).ToList().Count == 0 ? 0 : _caixaRepository.GetAll(x => x.DataVenda >= new DateTime(year, month, i, 0, 0, 0) && x.DataVenda <= new DateTime(year, month, i, 23, 59, 59)).ToList().Sum(x => x.ValorVenda);
-                    var despesas = _despesaHistoricoRepository.GetAll(x => x.DiaVencimento == i).ToList().Count == 0 ? 0 : _despesaHistoricoRepository.GetAll(x => x.DiaVencimento == i).ToList().Sum(x => x.Valor);
+                    var despesas = _despesaHistoricoRepository.GetAll(x => x.DataHistorico >= dataInicial && x.DataHistorico <= dataFinal && x.DiaVencimento == i).ToList().Count == 0 ? 0 : _despesaHistoricoRepository.GetAll(x => x.DataHistorico >= dataInicial && x.DataHistorico <= dataFinal && x.DiaVencimento == i).ToList().Sum(x => x.Valor);
+                    var pedidos = _pedidoRepository.GetAll(x => x.DataVencimento >= new DateTime(year, month, i, 0, 0, 0) && x.DataVencimento <= new DateTime(year, month, i, 23, 59, 59));
+                    var somaPorItem = pedidos.Select(pedido => new { Item = pedido.CodigoBarrasProduto, Soma = pedido.ValorCompra * pedido.Quantidade })
+                        .GroupBy(p => p.Item)
+                        .Select(g => new { Item = g.Key, Soma = g.Sum(p => p.Soma) });
+                    var valorSomaPedidos = somaPorItem.Count() == 0 ? 0 : somaPorItem.Sum(x => x.Soma);
+                    despesas = despesas + valorSomaPedidos;
                     var resumo = vendas - despesas;
 
                     string appObj = "{'Data':'" + new DateTime(year, month, i, 0, 0, 0).ToString("dd/MM/yyyy") + "', 'Receitas':'" + vendas + "', 'Despesa':'" + despesas + "', 'Resumo':'" + resumo + "'}";
