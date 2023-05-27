@@ -57,8 +57,12 @@ const Despesas = () => {
   function getDespesas() {
     axios.get('https://localhost:44334/Despesa')
     .then(response => {
-      setDespesas(response.data.filter(despesa => despesa.tipo !== "Geral"));
-      setDespesasGerais(response.data.filter(despesa => despesa.tipo === "Geral"));
+      const sortedDespesas = response.data.sort((a, b) => {
+        return a.tipo.localeCompare(b.tipo) || a.descricao.localeCompare(b.descricao);
+      });
+      setDespesas(sortedDespesas);
+      //setDespesas(response.data.filter(despesa => despesa.tipo !== "Geral"));
+      //setDespesasGerais(response.data.filter(despesa => despesa.tipo === "Geral"));
     })
     .catch(error => {
       console.log(error);
@@ -159,8 +163,12 @@ const Despesas = () => {
   useEffect(() => {
     axios.get('https://localhost:44334/Despesa')
       .then(response => {
-        setDespesas(response.data.filter(despesa => despesa.tipo !== "Geral"));
-        setDespesasGerais(response.data.filter(despesa => despesa.tipo === "Geral"));
+        const sortedDespesas = response.data.sort((a, b) => {
+          return a.tipo.localeCompare(b.tipo) || a.descricao.localeCompare(b.descricao);
+        });
+        setDespesas(sortedDespesas);
+        // setDespesas(response.data.filter(despesa => despesa.tipo !== "Geral"));
+        // setDespesasGerais(response.data.filter(despesa => despesa.tipo === "Geral"));
       })
       .catch(error => {
         console.log(error);
@@ -265,69 +273,75 @@ const Despesas = () => {
           <Button variant="warning" className="custom-button-add" style={{ height: "35px", width: "100px", marginBottom: "5px", color:"grey" }} onClick={() => adicionarDespesa()}>Adicionar</Button>
         </div>
       </Row>
-      <Table striped hover>
-        <thead>
-          <tr>
-            <th className="text-center">N°</th>
-            <th>Funcionários</th>
-            <th>Função</th>
-            <th className="text-center">Valor</th>
-            <th className="text-center">Dia Pagamento</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {despesas.map((item, index) => (
-            <tr key={item.id}>
-              <td className="text-center" style={{ verticalAlign: "middle"}}>{index}</td>
-              <td style={{ verticalAlign: "middle"}}>{item.descricao}</td>
-              <td style={{ verticalAlign: "middle"}}>{item.funcao}</td>
-              <td className="text-center" style={{ verticalAlign: "middle"}}>R$ {item.valor.toFixed(2)}</td>
-              <td className="text-center" style={{ verticalAlign: "middle"}}>{item.diaVencimento}</td>
-              <td className="text-center" style={{ verticalAlign: "middle"}}>
-                <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => editarDespesa(item)}>
-                  <FaPencilAlt />
-                </Button>
-                <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => removerDespesa(item)}>
-                  <FaTrash />
-                </Button>
-              </td>
+      <div style={{ maxHeight: '380px', overflowY: 'auto' }}>
+        <Table striped hover>
+          <thead>
+            <tr>
+              <th className="text-center">N°</th>
+              <th>Tipo</th>
+              <th>Despesa</th>
+              <th>Função</th>
+              <th className="text-center">Valor</th>
+              <th className="text-center">Dia Pagamento</th>
+              <th></th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {despesas.map((item, index) => (
+              <tr key={item.id}>
+                <td className="text-center" style={{ verticalAlign: "middle"}}>{index}</td>
+                <td style={{ verticalAlign: "middle"}}>{item.tipo}</td>
+                <td style={{ verticalAlign: "middle"}}>{item.descricao}</td>
+                <td style={{ verticalAlign: "middle"}}>{item.funcao}</td>
+                <td className="text-center" style={{ verticalAlign: "middle"}}>R$ {item.valor.toFixed(2)}</td>
+                <td className="text-center" style={{ verticalAlign: "middle"}}>{item.diaVencimento}</td>
+                <td className="text-center" style={{ verticalAlign: "middle"}}>
+                  <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => editarDespesa(item)}>
+                    <FaPencilAlt />
+                  </Button>
+                  <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => removerDespesa(item)}>
+                    <FaTrash />
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
       <br/>
-      <Table striped hover>
-        <thead>
-          <tr>
-            <th className="text-center">N°</th>
-            <th>Geral</th>
-            <th></th>
-            <th className="text-center">Valor</th>
-            <th className="text-center">Dia Pagamento</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {despesasGerais.map((item, index) => (
-            <tr key={item.id}>
-              <td className="text-center" style={{ verticalAlign: "middle"}}>{index}</td>
-              <td style={{ verticalAlign: "middle"}}>{item.descricao}</td>
-              <td></td>
-              <td className="text-center" style={{ verticalAlign: "middle"}}>R$ {item.valor.toFixed(2)}</td>
-              <td className="text-center" style={{ verticalAlign: "middle"}}>{item.diaVencimento}</td>
-              <td className="text-center" style={{ verticalAlign: "middle"}}>
-                <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => editarDespesa(item)}>
-                  <FaPencilAlt />
-                </Button>
-                <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => removerDespesa(item)}>
-                  <FaTrash />
-                </Button>
-              </td>
+      {/* <div style={{ maxHeight: '150px', overflowY: 'auto' }}>
+        <Table striped hover>
+          <thead>
+            <tr>
+              <th className="text-center">N°</th>
+              <th>Geral</th>
+              <th></th>
+              <th className="text-center">Valor</th>
+              <th className="text-center">Dia Pagamento</th>
+              <th></th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {despesasGerais.map((item, index) => (
+              <tr key={item.id}>
+                <td className="text-center" style={{ verticalAlign: "middle"}}>{index}</td>
+                <td style={{ verticalAlign: "middle"}}>{item.descricao}</td>
+                <td></td>
+                <td className="text-center" style={{ verticalAlign: "middle"}}>R$ {item.valor.toFixed(2)}</td>
+                <td className="text-center" style={{ verticalAlign: "middle"}}>{item.diaVencimento}</td>
+                <td className="text-center" style={{ verticalAlign: "middle"}}>
+                  <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => editarDespesa(item)}>
+                    <FaPencilAlt />
+                  </Button>
+                  <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => removerDespesa(item)}>
+                    <FaTrash />
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div> */}
       <Modal show={modalAberto} onHide={() => setModalAberto(false)}>
         <Modal.Header closeButton>
           <Modal.Title style={{fontWeight: "bold", color: "Grey"}}>{itemSelecionado ? "Editar Despesa" : "Nova Despesa"}</Modal.Title>

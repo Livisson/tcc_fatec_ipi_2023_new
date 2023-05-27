@@ -23,6 +23,7 @@ const Config = () => {
   const [formEnviado, setFormEnviado] = useState(false);
 
   const [nome, setNome] = useState("");
+  const [senhaAtual, setSenhaAtual] = useState("");
   const [senha, setSenha] = useState("");
   const [email, setEmail] = useState("");
 
@@ -30,6 +31,11 @@ const Config = () => {
 
   function handleNomeChange(event) {
     setNome(event.target.value);
+  }
+
+  function handleSenhaAtualChange(event) {
+    console.log(event.target.value.length)
+    setSenhaAtual(event.target.value);
   }
 
   function handleSenhaChange(event) {
@@ -59,6 +65,7 @@ const Config = () => {
     const usuarioEditado = {
       id: itemSelecionado.id,
       nome: nome,
+      senhaAtual: senhaAtual,
       senha: senha,
       email: email
     };
@@ -77,6 +84,7 @@ const Config = () => {
   
     setNome("");
     setSenha("");
+    setSenhaAtual("");
     setEmail("");
     setItemSelecionado(null);
     setModalAberto(false);
@@ -99,6 +107,7 @@ const Config = () => {
   const editarUsuario = (item) => {
     setItemSelecionado(item);
     setNome(item.nome);
+    setSenhaAtual("");
     setSenha("");
     setEmail(item.email);
     setModalAberto(true);
@@ -198,6 +207,11 @@ const Config = () => {
               <Form.Label>Nome do Usuário</Form.Label>
               <Form.Control type="text" placeholder="Digite o nome do Usuário" value={nome} onChange={handleNomeChange} required
                 isInvalid={formEnviado && nome.length < 5}/>
+            </Form.Group>
+            <Form.Group controlId="senha" style={{marginBottom: "20px"}}>
+              <Form.Label>Senha Atual</Form.Label>
+              <Form.Control type="password" placeholder="Digite a senha atual" value={senhaAtual} onChange={handleSenhaAtualChange} required minLength={5}
+                isInvalid={formEnviado && senha.length < 5}/>
             </Form.Group>
             <Form.Group controlId="senha" style={{marginBottom: "20px"}}>
               <Form.Label>Senha</Form.Label>

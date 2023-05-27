@@ -52,7 +52,16 @@ namespace GestaoComercio.Application.Services
 
         public async Task<UsuarioDTO> AtualizarUsuario(PostUsuarioCommand request)
         {
-            return _mapper.Map<UsuarioDTO>(await _usuarioRepository.UpdateAsync(_mapper.Map<Usuario>(request)));
+            //var usuario = _mapper.Map<Usuario>(request);
+            var usuarioAtual = await _usuarioRepository.GetAsync();
+            var dbUser = GetUsuarioByIndex(usuarioAtual.FirstOrDefault().Nome, request.SenhaAtual.GerarHash());
+            if (dbUser == null)
+            {
+                throw new MyExceptionApi("Senha atual incorreta!", HttpStatusCode.Unauthorized);
+            }
+            Usuario usuario = new Usuario(request.Id, request.Nome, request.Senha, request.Email);
+            usuario.SetSenhaHash();
+            return _mapper.Map<UsuarioDTO>(await _usuarioRepository.UpdateAsync(usuario));
         }
 
         public async Task<string> RecuperarSenha()
@@ -60,7 +69,9 @@ namespace GestaoComercio.Application.Services
             try
             {
                 var usuario = await _usuarioRepository.GetAsync();
-                ;
+                var usuarioParaRedefinir = usuario.FirstOrDefault();
+                string novaSenha = usuarioParaRedefinir.GerarNovaSenha();
+                await _usuarioRepository.UpdateAsync(usuarioParaRedefinir);
                 // Configura as informações do remetente
                 string remetente = "provap2pweb@outlook.com";
                 //string senha = "Pwebp22022";
@@ -68,7 +79,8 @@ namespace GestaoComercio.Application.Services
                 //string destinatario = "gestaocomercio.tccfatec@gmail.com";
                 string destinatario = usuario.FirstOrDefault().Email;
                 string assunto = "Recuperar Senha - Sistema Gestão de Comércio";
-                string mensagem = "O Usuário cadastrado é: Usuário - " + usuario.FirstOrDefault().Nome + " / Senha - " + usuario.FirstOrDefault().Senha;
+                //string mensagem = "O Usuário cadastrado é: Usuário - " + usuario.FirstOrDefault().Nome + " / Senha - " + usuario.FirstOrDefault().Senha;
+                string mensagem = "O Usuário cadastrado é: Usuário - " + usuario.FirstOrDefault().Nome + " / Senha - " + novaSenha;
 
                 // Configura o cliente SMTP
                 SmtpClient cliente = new SmtpClient("smtp-mail.outlook.com", 587);

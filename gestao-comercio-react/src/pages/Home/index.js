@@ -63,7 +63,7 @@ const Signin = () => {
           setError(res);
           return;
         }
-        navigate("/fornecedores");
+        navigate("/consolidado");
       })
       .catch((error) => {
         console.log(error.toString())

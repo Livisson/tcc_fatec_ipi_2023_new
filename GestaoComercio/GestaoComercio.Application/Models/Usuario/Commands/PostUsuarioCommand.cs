@@ -9,6 +9,7 @@ namespace GestaoComercio.Application.Models.Usuario.Commands
     {
         public int Id { get; set; }
         public string Nome { get; set; }
+        public string SenhaAtual { get; set; }
         public string Senha { get; set; }
         public string Email { get; set; }
     }

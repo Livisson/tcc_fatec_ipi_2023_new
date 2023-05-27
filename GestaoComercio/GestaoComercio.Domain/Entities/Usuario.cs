@@ -1,4 +1,5 @@
-﻿using GestaoComercio.Domain.Validation;
+﻿using GestaoComercio.Domain.Utils;
+using GestaoComercio.Domain.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +48,18 @@ namespace GestaoComercio.Domain.Entities
             Nome = nome;
             Senha = senha;
             Email = email;
+        }
+
+        public void SetSenhaHash()
+        {
+            Senha = Senha.GerarHash();
+        }
+
+        public string GerarNovaSenha()
+        {
+            string novaSenha = Guid.NewGuid().ToString().Substring(0, 8);
+            Senha = novaSenha.GerarHash();
+            return novaSenha;
         }
     }
 }

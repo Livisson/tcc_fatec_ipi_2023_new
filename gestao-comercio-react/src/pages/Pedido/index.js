@@ -10,6 +10,8 @@ import { Table, Button, Col, Row, Container, Modal, Form, Toast } from 'react-bo
 import './stylePedido.css';
 import axios from "axios";
 import InputMask from 'react-input-mask';
+import { Typeahead } from 'react-bootstrap-typeahead';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
 
 const Pedido = () => {
 
@@ -36,6 +38,8 @@ const Pedido = () => {
   const [valorCompra, setValorCompra] = useState("");
   const [quantidade, setQuantidade] = useState("");
   const [dataPagamento, setDataPagamento] = useState("");
+
+  const [selectedItem, setSelectedItem] = useState('');
 
   localStorage.setItem("selectedWindow", "pedido");
 
@@ -247,8 +251,17 @@ const Pedido = () => {
   };
 
   function handleSelectFiltro(selectedKey) {
-    setFornecedorFiltro(selectedKey);
+    console.log(selectedKey)
+    //setFornecedorFiltro(selectedKey);
     //console.log(fornecedores.find(fornecedor => fornecedor.cnpj === fornecedorFiltro))
+    const selectedFornecedor = selectedKey[0];
+    if (selectedFornecedor) {
+      setSelectedItem(selectedFornecedor);
+      setFornecedorFiltro(selectedFornecedor.cnpj);
+    } else {
+      setSelectedItem("");
+      setFornecedorFiltro(undefined);
+    }
   }
 
   return (
@@ -311,7 +324,7 @@ const Pedido = () => {
       <br/>
       <Row className="justify-content-md-center">
         <div className="d-flex justify-content-between">
-          <div className="d-flex align-items-center mb-4">
+          {/* <div className="d-flex align-items-center mb-4">
             <label style={{ flex: 1, marginRight:"10px", fontWeight: "bold", color: "Grey" }}>Fornecedor</label>
             <DropdownButton id="filtro-dropdown" title={fornecedorFiltro ? fornecedores.find(fornecedor => fornecedor.cnpj === fornecedorFiltro).nome  : "Selecione um Fornecedor"} variant="outline-secondary">
               {fornecedores.map((fornecedor) => (
@@ -320,44 +333,58 @@ const Pedido = () => {
                 </Dropdown.Item>
               ))}
             </DropdownButton>
+          </div> */}
+          <div className="d-flex align-items-center mb-4" style={{marginRight:"35px"}}>
+            <label style={{ flex: 1, marginRight:"10px", fontWeight: "bold", color: "Grey" }}>Fornecedor</label>
+            <Typeahead 
+              id="filtro-typeahead"
+              options={fornecedores}
+              labelKey="nome"
+              filterBy={['nome']}
+              placeholder="Selecione um Fornecedor"
+              selected={selectedItem ? [selectedItem] : []}
+              onChange={handleSelectFiltro}
+            />
           </div>
           <Button variant="warning" className="custom-button-add" style={{ height: "35px", width: "100px", marginBottom: "5px", color:"grey" }} onClick={() => adicionarPedido()}>Adicionar</Button>
         </div>
       </Row>
       <Row>
-        <Table striped hover>
-          <thead>
-            <tr>
-              <th className="text-center">Produto</th>
-              <th className="text-center">Cód. Barras</th>
-              <th className="text-center">Fornecedor</th>
-              <th className="text-center">Valor R$(un.)</th>
-              <th className="text-center">Quant.</th>
-              <th className="text-center">Valor R$(total)</th>
-              <th className="text-center">Pagamento</th>
-              <th></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {pedido.map((item, index) => (
-              <tr key={item.id}>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.nomeProduto}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.codigoBarras}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.nomeFornecedor}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>R$ {item.valorCompra.toFixed(2)}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.quantidade}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>R$ {item.valorTotal.toFixed(2)}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{new Date(item.dataPagamento).toLocaleDateString("pt-BR")}</td>
-                <td className="text-center" style={{ verticalAlign: "middle"}}>
-                  <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => removerPedido(item)}>
-                    <FaTrash />
-                  </Button>
-                </td>
+        <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+          <Table striped hover>
+            <thead>
+              <tr>
+                <th className="text-center">Produto</th>
+                <th className="text-center">Cód. Barras</th>
+                <th className="text-center">Fornecedor</th>
+                <th className="text-center">Valor R$(un.)</th>
+                <th className="text-center">Quant.</th>
+                <th className="text-center">Valor R$(total)</th>
+                <th className="text-center">Pagamento</th>
+                <th></th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {pedido.map((item, index) => (
+                <tr key={item.id}>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.nomeProduto}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.codigoBarras}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.nomeFornecedor}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>R$ {item.valorCompra.toFixed(2)}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.quantidade}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>R$ {item.valorTotal.toFixed(2)}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{new Date(item.dataPagamento).toLocaleDateString("pt-BR")}</td>
+                  <td className="text-center" style={{ verticalAlign: "middle"}}>
+                    <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => removerPedido(item)}>
+                      <FaTrash />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
       </Row>
       <br/>
       <Modal show={modalAberto} onHide={() => setModalAberto(false)}>
@@ -387,14 +414,14 @@ const Pedido = () => {
               <Form.Label>Código de Barras</Form.Label>
               <Form.Control
                 as={InputMask}
-                mask="999999999999-9"
+                mask="9999999999999"
                 maskChar=""
                 type="text"
                 placeholder="Digite o código de barras"
                 value={codigoBarras}
                 onChange={handleCodigoBarrasChange}
                 required
-                isInvalid={codigoBarras.length !== 14}
+                isInvalid={codigoBarras.length !== 13}
               />
               <Form.Control.Feedback type="invalid">
                 O código de barras deve ter 13 dígitos.

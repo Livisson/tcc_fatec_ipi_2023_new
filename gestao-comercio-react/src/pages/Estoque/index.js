@@ -2,13 +2,15 @@ import React, { useState, useEffect, useCallback } from "react";
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import { FaUser, FaChartBar, FaMapMarkedAlt, FaClipboardList, FaBox, FaMoneyBillWave, FaCashRegister, FaCog, FaSignOutAlt, FaPencilAlt } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useLinkClickHandler } from "react-router-dom";
 import LogoCompre from "../../LogoCompre.png";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import { Table, Button, Col, Row, Container, Modal, Form, Toast } from 'react-bootstrap';
 import './styleEstoque.css';
 import axios from "axios";
+import { Typeahead } from 'react-bootstrap-typeahead';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
 
 const Estoque = () => {
 
@@ -34,6 +36,8 @@ const Estoque = () => {
   const [quantidade, setQuantidade] = useState("");
   //const [cnpjFornecedor, setCnpjFornecedor] = useState("");
   //const [codigoBarras, setCodigoBarras] = useState("");
+  const [selectedItem, setSelectedItem] = useState('');
+  const [selectedItemProd, setSelectedItemProd] = useState('');
 
   localStorage.setItem("selectedWindow", "estoque");
 
@@ -160,14 +164,30 @@ const Estoque = () => {
 
   function handleSelectFiltroFornecedor(selectedKey) {
     console.log(selectedKey)
-    setFornecedorFiltro(selectedKey);
+    //setFornecedorFiltro(selectedKey);
     //console.log(fornecedores.find(fornecedor => fornecedor.cnpj === fornecedorFiltro))
+    const selectedFornecedor = selectedKey[0];
+    if (selectedFornecedor) {
+      setSelectedItem(selectedFornecedor);
+      setFornecedorFiltro(selectedFornecedor.cnpj);
+    } else {
+      setSelectedItem("");
+      setFornecedorFiltro(undefined);
+    }
   }
 
   function handleSelectFiltroProduto(selectedKey) {
     console.log(selectedKey)
-    setProdutoFiltro(selectedKey);
+    //setProdutoFiltro(selectedKey);
     //console.log(fornecedores.find(fornecedor => fornecedor.cnpj === fornecedorFiltro))
+    const selectedProduto = selectedKey[0];
+    if (selectedProduto) {
+      setSelectedItemProd(selectedProduto);
+      setProdutoFiltro(selectedProduto.nome);
+    } else {
+      setSelectedItemProd("");
+      setProdutoFiltro(undefined);
+    }
   }
 
   return (
@@ -230,7 +250,7 @@ const Estoque = () => {
       <br/>
       <Row className="justify-content-md-center">
         <div className="d-flex">
-          <div className="d-flex align-items-center mb-4" style={{marginRight:"35px"}}>
+          {/* <div className="d-flex align-items-center mb-4" style={{marginRight:"35px"}}>
             <label style={{ flex: 1, marginRight:"10px", fontWeight: "bold", color: "Grey" }}>Fornecedor</label>
             <DropdownButton id="filtro-dropdown" title={fornecedorFiltro ? fornecedores.find(fornecedor => fornecedor.cnpj === fornecedorFiltro).nome  : "Selecione um Fornecedor"} variant="outline-secondary">
               {fornecedores.map((fornecedor) => (
@@ -239,8 +259,20 @@ const Estoque = () => {
                 </Dropdown.Item>
               ))}
             </DropdownButton>
+          </div> */}
+          <div className="d-flex align-items-center mb-4" style={{marginRight:"35px"}}>
+            <label style={{ flex: 1, marginRight:"10px", fontWeight: "bold", color: "Grey" }}>Fornecedor</label>
+            <Typeahead 
+              id="filtro-typeahead"
+              options={fornecedores}
+              labelKey="nome"
+              filterBy={['nome']}
+              placeholder="Selecione um Fornecedor"
+              selected={selectedItem ? [selectedItem] : []}
+              onChange={handleSelectFiltroFornecedor}
+            />
           </div>
-          <div className="d-flex align-items-center mb-4">
+          {/* <div className="d-flex align-items-center mb-4">
             <label style={{ flex: 1, marginRight:"10px", fontWeight: "bold", color: "Grey" }}>Produto</label>
             <DropdownButton id="filtro-dropdown" title={produtoFiltro ? produtos.find(produto => produto.nome === produtoFiltro).nome  : "Selecione um Produto"} variant="outline-secondary">
               {produtos.map((produto) => (
@@ -249,34 +281,48 @@ const Estoque = () => {
                 </Dropdown.Item>
               ))}
             </DropdownButton>
+          </div> */}
+          <div className="d-flex align-items-center mb-4">
+            <label style={{ flex: 1, marginRight:"10px", fontWeight: "bold", color: "Grey" }}>Produto</label>
+            <Typeahead 
+              id="filtro-typeahead"
+              options={produtos}
+              labelKey="nome"
+              filterBy={['nome']}
+              placeholder="Selecione um Produto"
+              selected={selectedItemProd ? [selectedItemProd] : []}
+              onChange={handleSelectFiltroProduto}
+            />
           </div>
         </div>
       </Row>
       <Row>
-        <Table striped hover>
-          <thead>
-            <tr>
-              <th className="text-left">Nome Produto</th>
-              <th className="text-left">Nome Fornecedor</th>
-              <th className="text-center">Quantidade</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {estoque.map((item, index) => (
-              <tr key={item.id}>
-                <td style={{ verticalAlign: "middle", textAlign: "left"}}>{item.nomeProduto}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "left"}}>{item.nomeFornecedor}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.quantidade}</td>
-                <td className="text-center" style={{ verticalAlign: "middle"}}>
-                  <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => editarNomeProduto(item)}>
-                    <FaPencilAlt />
-                  </Button>
-                </td>
+        <div style={{ maxHeight: '280px', overflowY: 'auto' }}>
+          <Table striped hover>
+            <thead>
+              <tr>
+                <th className="text-left">Nome Produto</th>
+                <th className="text-left">Nome Fornecedor</th>
+                <th className="text-center">Quantidade</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {estoque.map((item, index) => (
+                <tr key={item.id}>
+                  <td style={{ verticalAlign: "middle", textAlign: "left"}}>{item.nomeProduto}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "left"}}>{item.nomeFornecedor}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.quantidade}</td>
+                  <td className="text-center" style={{ verticalAlign: "middle"}}>
+                    <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => editarNomeProduto(item)}>
+                      <FaPencilAlt />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
       </Row>
       <br/>
       <Modal show={modalAberto} onHide={() => setModalAberto(false)}>

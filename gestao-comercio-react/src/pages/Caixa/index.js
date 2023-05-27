@@ -25,6 +25,7 @@ const Caixa = () => {
   const [itemToDelete, setItemToDelete] = useState(null);
   const [produtoPesquisado, setProdutoPesquisado] = useState(null);
   const [showFinalizarConfirmation, setShowFinalizarConfirmation] = useState(false);
+  const [campoHabilitado, setCampoHabilitado] = useState(false);
 
   const [showErrorToast, setShowErrorToast] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -33,35 +34,49 @@ const Caixa = () => {
 
   const [barras, setBarras] = useState("");
   const [valor, setValor] = useState("");
-  const [quantidade, setQuantidade] = useState(1);
+  const [quantidade, setQuantidade] = useState("");
   const [totalProdutoSelecionado, setTotalProdutoSelecionado] = useState(0);
   const [produtos, setProdutos] = useState([]);
+  const [quantidadeEstoque, setQuantidadeEstoque] = useState(0);
   
   function handleBarrasChange(event) {
     setBarras(event.target.value);
+    if (event.target.value.length === 0){
+      setProdutoPesquisado(null);
+      setValor("");
+      setQuantidade("");
+    }
   }
 
   useEffect(() => {
     if (!barras) return;
     
-    axios
-      .get(`https://localhost:44334/Caixa?request=${barras}`)
-      .then((response) => {
-        setProdutoPesquisado(response.data.nome);
-        setValor(response.data.valorVenda);
-      })
-      .catch((error) => {
-        console.log(error);
-        setProdutoPesquisado(null);
-        setValor("");
-      });
+    axios.get(`https://localhost:44334/Caixa?request=${barras}`)
+    .then((response) => {
+      setProdutoPesquisado(response.data.nome);
+      setValor(response.data.valorVenda.toFixed(2));
+      setQuantidadeEstoque(response.data.qtdEstoqueTotal);
+      setCampoHabilitado(true);
+      setQuantidade(1);
+    })
+    .catch((error) => {
+      console.log(error);
+      setProdutoPesquisado(null);
+      setQuantidadeEstoque(0);
+      setValor("");
+    });
   }, [barras]);
 
   const handleAdicionar = () => {
     console.log(barras);
+
+    if (quantidade > quantidadeEstoque) {
+      setErrorMessage("A quantidade selecionada é maior do que a quantidade em estoque.");
+      setShowErrorToast(true);
+      return;
+    }
     
-    axios
-    .get(`https://localhost:44334/Caixa?request=${barras}`)
+    axios.get(`https://localhost:44334/Caixa?request=${barras}`)
     .then((response) => {
       console.log("Entrou");
       console.log(response);
@@ -98,9 +113,10 @@ const Caixa = () => {
       setShowErrorToast(true);
     });
     
+    setCampoHabilitado(false);
     setProdutoPesquisado(null);
     setValor("");
-    setQuantidade(1);
+    setQuantidade("");
     setBarras("");
   };
 
@@ -151,7 +167,7 @@ const Caixa = () => {
     setShowFinalizarConfirmation(true);
   };
 
-  const handleFinalizarCaixa = () => {
+  const handleFinalizarCaixa = (confirmed) => {
     const caixa = []; // Cria uma lista vazia para os produtos a ser enviados
     
     for (let i = 0; i < produtos.length; i++) {
@@ -166,6 +182,7 @@ const Caixa = () => {
       
       caixa.push(novo); // Adiciona o produto à lista de envio do caixa
       console.log(novo);
+      if (confirmed) setProdutos([]);
     }
 
     console.log(caixa);
@@ -250,7 +267,7 @@ const Caixa = () => {
                   <tr key={index}>
                     <td>{index}</td>
                     <td>{produto.produto.codigoBarras}</td>
-                    <td style={{ textAlign: "left"}}>{produto.produto.nome}</td>
+                    <td>{produto.produto.nome}</td>
                     <td>{produto.quantidade}</td>
                     <td>R$ {produto.produto.valor.toFixed(2)}</td>
                     <th>R$ {produto.total.toFixed(2)}</th>
@@ -276,7 +293,7 @@ const Caixa = () => {
             <Form.Control
               value={barras}
               as={InputMask}
-              mask="999999999999-9"
+              mask="9999999999999"
               maskChar={null}
               onChange={handleBarrasChange}
             />
@@ -298,9 +315,11 @@ const Caixa = () => {
                 <Form.Control
                   type="number"
                   min="1"
+                  max={quantidadeEstoque}
                   id="qnt"
                   value={quantidade}
                   onChange={(event) => setQuantidade(parseInt(event.target.value))}
+                  disabled={!campoHabilitado}
                 />
               </InputGroup>
             </Col>
@@ -322,7 +341,7 @@ const Caixa = () => {
             </Col>
           </Row>
           <Row className="mt-4 mb-3 ps-3 pe-3">
-            <Button size="sm" onClick={handleAdicionar}>
+            <Button size="sm" onClick={handleAdicionar} disabled={!campoHabilitado}>
               CONFIRMAR ITEM
             </Button>
           </Row>

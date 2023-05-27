@@ -18,6 +18,8 @@ const Consolidado = () => {
 
   const [events, setEvents] = useState([]);
   const [currentDate, setCurrentDate] = useState(moment());
+  const [resumoConsolidado, setResumoConsolidado] = useState({});
+  const [saldoPositivo, setSaldoPositivo] = useState(false);
 
   localStorage.setItem("selectedWindow", "consolidado");
 
@@ -29,11 +31,22 @@ const Consolidado = () => {
     var mes = currentDate.month() + 1;
     var ano = currentDate.year();
     var anoMes = ano + mes.toString().padStart(2, "0");
-    console.log(anoMes)
+
     axios
       .get(`https://localhost:44334/Caixa/getConsolidado?data=${anoMes}`)
       .then((response) => {
         setEvents(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    axios
+      .get(`https://localhost:44334/Caixa/getResumoConsolidado?data=${anoMes}`)
+      .then((response) => {
+        setResumoConsolidado(response.data);
+        const saldoNumerico = parseFloat(response.data.saldoGeral.replace(/[^\d,-]/g, '').replace(',', '.'));
+        setSaldoPositivo(saldoNumerico >= 0);
       })
       .catch((error) => {
         console.log(error);
@@ -133,6 +146,18 @@ const Consolidado = () => {
     monthsShort: moment.localeData().monthsShort().map((m) => capitalize(m))
   });
 
+  if (!resumoConsolidado) {
+    return <div>Carregando...</div>;
+  }
+
+  const labelStyleSaldo = {
+    fontWeight: 'bold', 
+    color: saldoPositivo ? '#007A5D' : '#FF2F15',
+    fontSize: '22px', 
+    backgroundColor: saldoPositivo ? '#DAF5F0' : '#FBE1EA',
+    padding: '0 5px'
+  };
+
   return (
     <Container style={{ backgroundColor: "white" }}>
       <Row className="justify-content-md-center">
@@ -184,6 +209,15 @@ const Consolidado = () => {
         </div>
       </Row>
       <br/>
+      <br/>
+      <Row className="justify-content-md-center">
+        <div className="d-flex justify-content-between">
+          <label style={{ fontWeight: 'bold', color: '#007A5D', fontSize: '22px' }}>Receitas: {resumoConsolidado.receita}</label>
+          <label style={{ fontWeight: 'bold', color: '#FF2F15', fontSize: '22px' }}>Despesas: {resumoConsolidado.despesa}</label>
+          <label style={{ fontWeight: 'bold', color: '#61AFFE', fontSize: '22px' }}>Receita Prevista: {resumoConsolidado.receitaPrevista}</label>
+          <label style={labelStyleSaldo}>Saldo Geral: {resumoConsolidado.saldoGeral}</label>
+        </div>
+      </Row>
       <br/>
       <Calendar
         localizer={localizer}

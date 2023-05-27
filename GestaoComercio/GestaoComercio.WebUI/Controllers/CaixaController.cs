@@ -53,8 +53,22 @@ namespace GestaoComercio.WebUI.Controllers
         public IActionResult GetConsolidado(string data) 
         {
                 //request = 202303;
-                var teste = _caixaService.ConsultarConsolidadoMes(data);
-                return Ok(teste);
+                var consolidado = _caixaService.ConsultarConsolidadoMes(data);
+                return Ok(consolidado);
+        }
+
+        [HttpGet("getResumoConsolidado")]
+        public IActionResult GetResumoConsolidado(string data)
+        {
+            //request = 202303;
+            var consolidado = _caixaService.ConsultarResumoConsolidadoMes(data);
+            return Ok(consolidado);
+        }
+
+        [HttpGet("getConsultaChatGTP")]
+        public async Task<IActionResult> GetConsultaChatGPT(string query)
+        {
+            return Ok(await _caixaService.UseChatGPT(query));
         }
 
     }

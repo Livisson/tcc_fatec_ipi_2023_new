@@ -9,6 +9,8 @@ import "bootstrap/dist/js/bootstrap.bundle.min";
 import { Table, Button, Col, Row, Container, Modal, Form, Toast } from 'react-bootstrap';
 import './stylePrecificar.css';
 import axios from "axios";
+import { Typeahead } from 'react-bootstrap-typeahead';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
 
 const Precificar = () => {
 
@@ -39,6 +41,7 @@ const Precificar = () => {
   const [perMargem, setPerMargem] = useState("");
   const [valorSugerido, setValorSugerido] = useState("");
   const [valorVenda, setValorVenda] = useState("");
+  const [selectedItem, setSelectedItem] = useState('');
 
   localStorage.setItem("selectedWindow", "precificar");
 
@@ -130,7 +133,8 @@ const Precificar = () => {
     if (fornecedores.length > 0 && fornecedorFiltro === "") {
       const primeiroFornecedor = fornecedores[0];
       if (primeiroFornecedor && primeiroFornecedor.cnpj) {
-        setFornecedorFiltro(primeiroFornecedor.cnpj);
+        //setFornecedorFiltro(primeiroFornecedor.cnpj);
+        setFornecedorFiltro(undefined);
       }
     }
 
@@ -154,9 +158,18 @@ const Precificar = () => {
     //setModoEditar(true);
   };
 
-  function handleSelectFiltro(selectedKey) {
-    //console.log(selectedKey)
-    setFornecedorFiltro(selectedKey);
+  function handleSelectFiltroFornecedor(selectedKey) {
+    console.log(selectedKey)
+    //setFornecedorFiltro(selectedKey);
+    //console.log(fornecedores.find(fornecedor => fornecedor.cnpj === fornecedorFiltro))
+    const selectedFornecedor = selectedKey[0];
+    if (selectedFornecedor) {
+      setSelectedItem(selectedFornecedor);
+      setFornecedorFiltro(selectedFornecedor.cnpj);
+    } else {
+      setSelectedItem("");
+      setFornecedorFiltro(undefined);
+    }
   }
 
   return (
@@ -219,7 +232,7 @@ const Precificar = () => {
       <br/>
       <Row className="justify-content-md-center">
         <div className="d-flex justify-content-between">
-          <div className="d-flex align-items-center mb-4">
+          {/* <div className="d-flex align-items-center mb-4">
             <label style={{ flex: 1, marginRight:"10px", fontWeight: "bold", color: "Grey" }}>Fornecedor</label>
             <DropdownButton id="filtro-dropdown" title={fornecedorFiltro && fornecedores.find(fornecedor => fornecedor.cnpj === fornecedorFiltro)?.nome ? fornecedores.find(fornecedor => fornecedor.cnpj === fornecedorFiltro).nome : "Selecione um Fornecedor"} variant="outline-secondary">
               {fornecedores.map((fornecedor) => (
@@ -228,45 +241,59 @@ const Precificar = () => {
                 </Dropdown.Item>
               ))}
             </DropdownButton>
+          </div> */}
+          <div className="d-flex align-items-center mb-4" style={{marginRight:"35px"}}>
+            <label style={{ flex: 1, marginRight:"10px", fontWeight: "bold", color: "Grey" }}>Fornecedor</label>
+            <Typeahead 
+              id="filtro-typeahead"
+              options={fornecedores}
+              labelKey="nome"
+              filterBy={['nome']}
+              placeholder="Selecione um Fornecedor"
+              selected={selectedItem ? [selectedItem] : []}
+              onChange={handleSelectFiltroFornecedor}
+            />
           </div>
         </div>
       </Row>
       <Row>
-        <Table striped hover>
-          <thead>
-            <tr>
-              <th className="text-center">Produto</th>
-              <th className="text-center">Cód. Barras</th>
-              <th className="text-center">R$ (Compra)</th>
-              <th className="text-center">Estoque</th>
-              <th className="text-center">Desconto (%)</th>
-              <th className="text-center">Margem (%)</th>
-              <th className="text-center">R$ (Valor Sugerido)</th>
-              <th className="text-center">R$ (Valor Venda)</th>
-              <th></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {precificacoes.map((item, index) => (
-              <tr key={item.id}>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.nomeProduto}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.codigoBarras}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>R$ {item.valorCompra.toFixed(2)}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.estoque}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center", backgroundColor: "lightcoral"}}>{item.perDesconto} %</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center", backgroundColor: "lightgreen"}}>{item.perMargem} %</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center", backgroundColor: "lightgreen"}}>R$ {item.valorSugerido.toFixed(2)}</td>
-                <td style={{ verticalAlign: "middle", textAlign: "center", backgroundColor: "lime"}}>R$ {item.valorVenda.toFixed(2)}</td>
-                <td className="text-center" style={{ verticalAlign: "middle"}}>
-                  <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => editarPrecificacao(item)}>
-                    <FaPencilAlt />
-                  </Button>
-                </td>
+        <div style={{ maxHeight: '280px', overflowY: 'auto' }}>
+          <Table striped hover>
+            <thead>
+              <tr>
+                <th className="text-center">Produto</th>
+                <th className="text-center">Cód. Barras</th>
+                <th className="text-center">R$ (Compra)</th>
+                <th className="text-center">Estoque</th>
+                <th className="text-center">Desconto (%)</th>
+                <th className="text-center">Margem (%)</th>
+                <th className="text-center">R$ (Valor Sugerido)</th>
+                <th className="text-center">R$ (Valor Venda)</th>
+                <th></th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {precificacoes.map((item, index) => (
+                <tr key={item.id}>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.nomeProduto}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.codigoBarras}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>R$ {item.valorCompra.toFixed(2)}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.estoque}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center", backgroundColor: "lightcoral"}}>{item.perDesconto} %</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center", backgroundColor: "lightgreen"}}>{item.perMargem} %</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center", backgroundColor: "lightgreen"}}>R$ {item.valorSugerido.toFixed(2)}</td>
+                  <td style={{ verticalAlign: "middle", textAlign: "center", backgroundColor: "lime"}}>R$ {item.valorVenda.toFixed(2)}</td>
+                  <td className="text-center" style={{ verticalAlign: "middle"}}>
+                    <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => editarPrecificacao(item)}>
+                      <FaPencilAlt />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
       </Row>
       <br/>
       <Modal show={modalAberto} onHide={() => setModalAberto(false)}>
@@ -358,7 +385,7 @@ const Precificar = () => {
                 type="number"
                 step="0.01"
                 placeholder="Digite o valor sugerido"
-                value={valorSugerido}
+                value={valorSugerido ? valorSugerido.toFixed(2) : ""}
                 required
                 disabled
                 readOnly

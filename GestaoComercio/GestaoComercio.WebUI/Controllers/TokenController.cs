@@ -2,6 +2,7 @@
 using GestaoComercio.Application.Services;
 using GestaoComercio.Domain.Entities;
 using GestaoComercio.Domain.Interfaces;
+using GestaoComercio.Domain.Utils;
 using GestaoComercio.WebUI.Models.Usuario;
 using GestaoComercio.WebUI.TokenManager;
 using Microsoft.AspNetCore.Authorization;
@@ -32,12 +33,12 @@ namespace GestaoComercio.WebUI.Controllers
         [HttpPost("Authenticate")]
         public IActionResult Authenticate([FromBody]UserCredential credential)
         {
-            var dbUser = _usuarioService.GetUsuarioByIndex(credential.UserName, credential.Password);
+            var dbUser = _usuarioService.GetUsuarioByIndex(credential.UserName, credential.Password.GerarHash());
             if (dbUser == null)
             {
                 return Unauthorized();
             }
-            var token = _tokenManager.Authenticate(credential.UserName, credential.Password);
+            var token = _tokenManager.Authenticate(credential.UserName, credential.Password.GerarHash());
 
             //var dbUser = _usuarioService.ConsultaUsuario();
             //var token = _tokenManager.Authenticate(credential.UserName, credential.Password);
