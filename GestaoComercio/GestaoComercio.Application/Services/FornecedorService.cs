@@ -51,7 +51,7 @@ namespace GestaoComercio.Application.Services
 
         public async Task<IEnumerable<FornecedorDTO>> ConsultaFornecedores()
         {
-            return _mapper.Map<IEnumerable<FornecedorDTO>>(await _fornecedorRepository.GetAsync());
+            return _mapper.Map<IEnumerable<FornecedorDTO>>(await _fornecedorRepository.GetAsync()).OrderBy(x => x.Nome);
         }
 
         public FornecedorDTO ConsultaFornecedoresByCnpj(string cnpj)

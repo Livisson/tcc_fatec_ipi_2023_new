@@ -6,13 +6,14 @@ import { Link } from "react-router-dom";
 import LogoCompre from "../../LogoCompre.png";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
-import { Button, Col, Row, Container } from 'react-bootstrap';
+import { Button, Col, Row, Container, Modal } from 'react-bootstrap';
 import './styleConsolidado.css';
 import axios from "axios";
 import { Calendar, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment'
 import 'moment/locale/pt-br';
 import 'react-big-calendar/lib/css/react-big-calendar.css'
+import { ClipLoader } from "react-spinners";
 
 const Consolidado = () => {
 
@@ -20,11 +21,35 @@ const Consolidado = () => {
   const [currentDate, setCurrentDate] = useState(moment());
   const [resumoConsolidado, setResumoConsolidado] = useState({});
   const [saldoPositivo, setSaldoPositivo] = useState(false);
+  const [estimativa, setEstimativa] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   localStorage.setItem("selectedWindow", "consolidado");
 
   const handleNavigate = (newDate, view) => {
     setCurrentDate(moment(newDate));
+  };
+
+  const estimativaRequest = () => {
+    setLoading(true);
+    setShowModal(true);
+
+    axios.post("https://localhost:44334/Caixa/getConsultaChatGPT", events)
+      .then(response => {
+        setEstimativa(response.data)
+      })
+      .catch(error => {
+        setEstimativa("Falha ao consultar o ChatGPT.")
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const fecharModal = () => {
+    setShowModal(false);
+    setEstimativa('');
   };
 
   useEffect(() => {
@@ -219,6 +244,11 @@ const Consolidado = () => {
         </div>
       </Row>
       <br/>
+      <br/>
+      <Row className="justify-content-md-right">
+        <Button variant="warning" className="custom-button-add" onClick={estimativaRequest} style={{ height: "50px", width: "250px", marginLeft: "10px", marginBottom: "5px", color:"grey" }}>Resumo Estatístico ChatGPT</Button>
+      </Row>
+      <br/>
       <Calendar
         localizer={localizer}
         events={events}
@@ -232,6 +262,42 @@ const Consolidado = () => {
         dayLayoutAlgorithm={'no-overlap'}
         onNavigate={handleNavigate}
       />
+      <Modal show={showModal} onHide={fecharModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>{loading ? "Carregando..." : "Resumo Estatístico ChatGPT"}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {loading ? (
+            <div className="text-center">
+              <ClipLoader
+                css={`
+                  display: block;
+                  margin: 0 auto;
+                `}
+                size={35}
+                color={"grey"}
+                loading={loading}
+              />
+            </div>
+          ) : (
+            <>
+              <pre style={{ whiteSpace: "pre-line" }}>{estimativa}</pre>
+              <br/>
+              <br/>
+              <Row>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <label style={{ color: 'red', fontSize: '11px', textAlign: 'justify' }}>Importante! Esta é uma feature experimental. O resultado de pesquisa no ChatGPT não é de nossa responsabilidade. Foi observado que a resposta por vezes apresenta resultado diferentes e esse funcionamente não está sob nosso controle.</label>
+                </div>
+              </Row>
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Button variant="secondary" onClick={fecharModal}>Fechar</Button>
+          </div>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GestaoComercio.Application.Models.Caixa.Commands;
+using GestaoComercio.Application.Models.Responses;
 using GestaoComercio.Application.Services;
 using GestaoComercio.Domain.Entities;
 using GestaoComercio.Domain.Interfaces;
@@ -65,8 +66,8 @@ namespace GestaoComercio.WebUI.Controllers
             return Ok(consolidado);
         }
 
-        [HttpGet("getConsultaChatGTP")]
-        public async Task<IActionResult> GetConsultaChatGPT(string query)
+        [HttpPost("getConsultaChatGPT")]
+        public async Task<IActionResult> GetConsultaChatGPT([FromBody] List<TelaConsolidadoResponse> query)
         {
             return Ok(await _caixaService.UseChatGPT(query));
         }

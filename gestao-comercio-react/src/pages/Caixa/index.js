@@ -351,7 +351,7 @@ const Caixa = () => {
             </Button>
           </Row>
           <Row className="mt-4 mb-3 ps-3 pe-3">
-            <Button variant="success" size="sm" onClick={finalizarCaixa}>
+            <Button variant="success" size="sm" onClick={finalizarCaixa} disabled={produtos.length === 0}>
               FINALIZAR COMPRA
             </Button>
           </Row>
@@ -402,7 +402,7 @@ const Caixa = () => {
             Tem certeza que deseja finalizar a compra?
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="danger" onClick={() => handleFinalizarCaixa(true)}>
+            <Button variant="success" onClick={() => handleFinalizarCaixa(true)}>
               Confirmar
             </Button>
             <Button variant="secondary" onClick={() => handleFinalizarCaixa(false)}>

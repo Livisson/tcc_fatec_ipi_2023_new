@@ -46,7 +46,7 @@ namespace GestaoComercio.Application.Services
 
         public async Task<IEnumerable<ProdutoDTO>> GetProdutos()
         {
-            return _mapper.Map<IEnumerable<ProdutoDTO>>(await _produtoRepository.GetAsync());
+            return _mapper.Map<IEnumerable<ProdutoDTO>>(await _produtoRepository.GetAsync()).OrderBy(x => x.Nome);
         }
 
         public List<TelaPrecificacaoResponse> ConsultaPrecificacao(string codigoFornecedor)

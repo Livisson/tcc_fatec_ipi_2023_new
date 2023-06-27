@@ -7,6 +7,7 @@ import useAuth from "../../hooks/useAuth";
 import './style.css';
 import { FaUser } from 'react-icons/fa';
 import LogoCompre from "../../LogoCompre.png"
+import backgroundImage from '../../LogoDAT3.jpg';
 import axios from "axios";
 import { Toast } from 'react-bootstrap';
 
@@ -93,9 +94,17 @@ const Signin = () => {
         setShowErrorToast(true)
       });
   }
+  
+  const backgroundStyle = {
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundRepeat: 'no-repeat',
+    //backgroundSize: 'cover',
+    //backgroundPosition: 'center',
+    minHeight: '100vh', // opcional: define a altura mínima da tela inteira
+  };
 
   return (
-    <C.ContentCapa>
+    <C.ContentCapa style={backgroundStyle}>
       <C.Container>
         <C.ContentImg>
           <img src={LogoCompre} alt="Logo" />

@@ -284,31 +284,33 @@ const Fornecedor = () => {
         </div>
       </Row>
       <Row>
-        <Table striped hover>
-          <thead>
-            <tr>
-              <th className="text-center">CNPJ</th>
-              <th>Fornecedor</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {fornecedor.map((item, index) => (
-              <tr key={index}>
-                <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.cnpj && formatCnpj(item.cnpj)}</td>
-                <td style={{ verticalAlign: "middle"}}>{item.nome}</td>
-                <td className="text-center" style={{ verticalAlign: "middle"}}>
-                  <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => editarFornecedor(item)}>
-                    <FaPencilAlt />
-                  </Button>
-                  <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => removerFornecedor(item)}>
-                    <FaTrash />
-                  </Button>
-                </td>
+        <div style={{ maxHeight: '380px', overflowY: 'auto' }}>
+          <Table striped hover>
+            <thead>
+              <tr>
+                <th className="text-center">CNPJ</th>
+                <th>Fornecedor</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {fornecedor.map((item, index) => (
+                <tr key={index}>
+                  <td style={{ verticalAlign: "middle", textAlign: "center"}}>{item.cnpj && formatCnpj(item.cnpj)}</td>
+                  <td style={{ verticalAlign: "middle"}}>{item.nome}</td>
+                  <td className="text-center" style={{ verticalAlign: "middle"}}>
+                    <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => editarFornecedor(item)}>
+                      <FaPencilAlt />
+                    </Button>
+                    <Button variant="outline-secondary" style={{ border: "none"}} onClick={() => removerFornecedor(item)}>
+                      <FaTrash />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
       </Row>
       <br/>
       <Modal show={modalAberto} onHide={() => setModalAberto(false)}>

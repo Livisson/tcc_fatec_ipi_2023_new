@@ -37,7 +37,7 @@ export const ContentImg = styled.div`
 `;
 
 export const ContentCapa = styled.div`
-  background-image: url("../../Capa2.png");
+  background-image: url("../../LogoDAT.png");
   background-repeat: no-repeat;
   background-color: white;
 `;
